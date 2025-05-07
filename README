@@ -1,4 +1,5 @@
-Creacion de base de datos
+Creacion de base de datos para utilizar en la aplicacion de comedor comunitario
+-- Version: 1.0
 
 CREATE DATABASE IF NOT EXISTS `comedor_comunitario`;
 USE `comedor_comunitario`;
