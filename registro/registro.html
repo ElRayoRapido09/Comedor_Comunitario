@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro - Comedor Comunitario</title>
+    <link rel="stylesheet" href="styleRG.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap">
+</head>
+<body>
+    <div class="container">
+        <div class="form-container">
+            <div class="header">
+                <div class="logo-container">
+                    <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-EOaIf34cLwcOlk71z2YxtJlOpQymdl.png" alt="Logo Comedor Comunitario" class="logo">
+                    <h1>Comedor Comunitario</h1>
+                </div>
+                <a href="../inicio/index.html" class="login-link">Iniciar Sesión</a>
+            </div>
+            
+            <div class="form-title">
+                <h2>Registro de Beneficiario</h2>
+                <p>Complete el formulario para registrarse en nuestro comedor comunitario</p>
+            </div>
+            
+            <form id="registro-form" method="POST" action="procesar_registro.php">
+                <div class="form-group">
+                    <label for="nombre">Nombre</label>
+                    <input type="text" id="nombre" name="nombre" placeholder="Ingrese su nombre" required>
+                    <span class="error-message" id="nombre-error"></span>
+                </div>
+                
+                <div class="form-group">
+                    <label for="apellidos">Apellidos</label>
+                    <input type="text" id="apellidos" name="apellidos" placeholder="Ingrese sus apellidos" required>
+                    <span class="error-message" id="apellidos-error"></span>
+                </div>
+                
+                <div class="form-group">
+                    <label for="direccion">Dirección</label>
+                    <input type="text" id="direccion" name="direccion" placeholder="Ingrese su dirección completa" required>
+                    <span class="error-message" id="direccion-error"></span>
+                </div>
+                
+                <div class="form-group half">
+                    <label for="edad">Edad</label>
+                    <input type="number" id="edad" name="edad" min="1" max="120" placeholder="Edad" required>
+                    <span class="error-message" id="edad-error"></span>
+                </div>
+                
+                <div class="form-group">
+                    <label>Sexo</label>
+                    <div class="radio-group">
+                        <label class="radio-label">
+                            <input type="radio" name="sexo" value="masculino" required>
+                            <span class="radio-custom"></span>
+                            Masculino
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="sexo" value="femenino">
+                            <span class="radio-custom"></span>
+                            Femenino
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="sexo" value="otro">
+                            <span class="radio-custom"></span>
+                            Otro
+                        </label>
+                    </div>
+                    <span class="error-message" id="sexo-error"></span>
+                </div>
+                
+                <div class="form-group">
+                    <label for="correo">Correo electrónico (opcional)</label>
+                    <input type="email" id="correo" name="correo" placeholder="correo@ejemplo.com">
+                    <span class="error-message" id="correo-error"></span>
+                </div>
+                
+                <div class="form-group">
+                    <label for="contrasena">Contraseña</label>
+                    <div class="password-container">
+                        <input type="password" id="contrasena" name="contrasena" placeholder="Cree una contraseña" required>
+                        <button type="button" id="toggle-password" class="toggle-password">
+                            <span class="eye-icon">👁️</span>
+                        </button>
+                    </div>
+                    <span class="error-message" id="contrasena-error"></span>
+                </div>
+                
+                <div class="form-group checkbox-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="terminos" name="terminos" value="on" required>
+                        <span class="checkbox-custom"></span>
+                        Acepto los términos y condiciones del comedor comunitario
+                    </label>
+                    <span class="error-message" id="terminos-error"></span>
+                </div>
+                
+                <div class="button-container">
+                    <button type="button" id="cancelar-btn" class="secondary-btn">Cancelar</button>
+                    <button type="submit" id="guardar-btn">Registrarme</button>
+                </div>
+            </form>
+            
+            <div id="success-message" class="success-message">
+                <div class="success-content">
+                    <div class="success-icon">✓</div>
+                    <h2>¡Registro Exitoso!</h2>
+                    <p>Su registro en el comedor comunitario ha sido completado correctamente.</p>
+                    <p>Será redirigido automáticamente...</p>
+                    <button id="close-success">Continuar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo">
+                <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-EOaIf34cLwcOlk71z2YxtJlOpQymdl.png" alt="Logo Comedor Comunitario" class="logo-small">
+                <span>Comedor Comunitario</span>
+            </div>
+            <div class="footer-info">
+                <p>Dirección: Calle Principal #123, Ciudad</p>
+                <p>Teléfono: (123) 456-7890</p>
+                <p>Horario: Lunes a Viernes 12:00 - 15:00</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 Comedor Comunitario. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+    
+<script src="scriptRG.js"></script>
+</body>
+</html>

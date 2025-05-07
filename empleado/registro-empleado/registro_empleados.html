@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Empleados - Comedor Comunitario</title>
+    <link rel="stylesheet" href="registro_empleados_styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo-container">
+                <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-EOaIf34cLwcOlk71z2YxtJlOpQymdl.png" alt="Logo Comedor Comunitario" class="logo">
+                <h1>Comedor Comunitario</h1>
+            </div>
+            <a href="login.html" class="login-button">Regresar</a>
+        </div>
+
+        <div class="main-content">
+            <h2>Registro de Empleado</h2>
+            <p class="subtitle">Complete el formulario para registrar un nuevo empleado en el sistema</p>
+            
+            <div class="divider"></div>
+
+            <form id="registro-empleado-form">
+                <div class="form-group">
+                    <label for="nombre">Nombre</label>
+                    <input type="text" id="nombre" name="nombre" placeholder="Ingrese su nombre" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="apellidos">Apellidos</label>
+                    <input type="text" id="apellidos" name="apellidos" placeholder="Ingrese sus apellidos" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="direccion">Dirección</label>
+                    <input type="text" id="direccion" name="direccion" placeholder="Ingrese su dirección completa" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group half">
+                        <label for="edad">Edad</label>
+                        <input type="number" id="edad" name="edad" placeholder="Edad" min="18" max="99" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="correo">Correo Electrónico</label>
+                    <input type="email" id="correo" name="correo" placeholder="Ingrese su correo electrónico" required>
+                </div>
+
+
+                <div class="form-row">
+                    <div class="form-group half">
+                        <label for="contrasena">Contraseña</label>
+                        <input type="password" id="contrasena" name="contrasena" placeholder="Ingrese una contraseña" required>
+                    </div>
+
+                    <div class="form-group half">
+                        <label for="confirmar-contrasena">Confirmar Contraseña</label>
+                        <input type="password" id="confirmar-contrasena" name="confirmar-contrasena" placeholder="Confirme su contraseña" required>
+                    </div>
+                </div>
+
+                <div class="form-group checkbox-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="terminos" name="terminos" required>
+                        <span>Acepto los términos y condiciones</span>
+                    </label>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="submit-button">Registrar Empleado</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="success-message" class="modal">
+        <div class="modal-content">
+            <h3>¡Registro Exitoso!</h3>
+            <p>El empleado ha sido registrado correctamente en el sistema.</p>
+            <button id="close-modal" class="submit-button">Aceptar</button>
+        </div>
+    </div>
+
+    <script src="registro_empleados_script.js"></script>
+</body>
+</html>

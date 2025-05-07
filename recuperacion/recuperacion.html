@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recuperar Contraseña - Comedor Comunitario</title>
+    <link rel="stylesheet" href="stylesRC.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap">
+</head>
+<body>
+    <div class="container">
+        <div class="recovery-container">
+            <div class="logo-header">
+                <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-EOaIf34cLwcOlk71z2YxtJlOpQymdl.png" alt="Logo Comedor Comunitario" class="logo">
+                <h1>Comedor Comunitario</h1>
+            </div>
+            
+            <div class="form-card">
+                <h2>Recuperar Contraseña</h2>
+                <p class="instructions">Ingrese su correo electrónico y le enviaremos instrucciones para restablecer su contraseña.</p>
+                
+                <form id="recovery-form">
+                    <div class="form-group">
+                        <label for="correo">Correo electrónico</label>
+                        <input type="email" id="correo" name="correo" placeholder="Ingrese su correo electrónico" required>
+                        <span class="error-message" id="correo-error"></span>
+                    </div>
+                    
+                    <button type="submit" class="recovery-button">Enviar Instrucciones</button>
+                    
+                    <div class="login-link">
+                        <a href="index.html">Volver a Iniciar Sesión</a>
+                    </div>
+                </form>
+            </div>
+            
+            <div id="verification-step" class="form-card verification-step">
+                <h2>Verificación</h2>
+                <p class="instructions">Hemos enviado un código de verificación a su correo electrónico. Por favor, ingrese el código para continuar.</p>
+                
+                <form id="verification-form">
+                    <div class="form-group">
+                        <label for="codigo">Código de verificación</label>
+                        <div class="verification-code-container">
+                            <input type="text" class="verification-input" maxlength="1" pattern="[0-9]" required>
+                            <input type="text" class="verification-input" maxlength="1" pattern="[0-9]" required>
+                            <input type="text" class="verification-input" maxlength="1" pattern="[0-9]" required>
+                            <input type="text" class="verification-input" maxlength="1" pattern="[0-9]" required>
+                            <input type="text" class="verification-input" maxlength="1" pattern="[0-9]" required>
+                            <input type="text" class="verification-input" maxlength="1" pattern="[0-9]" required>
+                        </div>
+                        <span class="error-message" id="codigo-error"></span>
+                    </div>
+                    
+                    <div class="resend-code">
+                        <span>¿No recibió el código?</span>
+                        <button type="button" id="resend-btn">Reenviar</button>
+                    </div>
+                    
+                    <button type="submit" class="recovery-button">Verificar</button>
+                    
+                    <div class="login-link">
+                        <a href="../inicio/index.html">Volver a Iniciar Sesión</a>
+                    </div>
+                </form>
+            </div>
+            
+            <div id="new-password-step" class="form-card new-password-step">
+                <h2>Nueva Contraseña</h2>
+                <p class="instructions">Por favor, ingrese su nueva contraseña.</p>
+                
+                <form id="new-password-form">
+                    <div class="form-group">
+                        <label for="nueva-contrasena">Nueva contraseña</label>
+                        <div class="password-container">
+                            <input type="password" id="nueva-contrasena" name="nueva-contrasena" placeholder="Ingrese su nueva contraseña" required>
+                            <button type="button" id="toggle-password-1" class="toggle-password">
+                                <span class="eye-icon">👁️</span>
+                            </button>
+                        </div>
+                        <span class="error-message" id="nueva-contrasena-error"></span>
+                        <div class="password-strength">
+                            <div class="strength-meter">
+                                <div class="strength-segment"></div>
+                                <div class="strength-segment"></div>
+                                <div class="strength-segment"></div>
+                                <div class="strength-segment"></div>
+                            </div>
+                            <span class="strength-text">Seguridad: Débil</span>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="confirmar-contrasena">Confirmar contraseña</label>
+                        <div class="password-container">
+                            <input type="password" id="confirmar-contrasena" name="confirmar-contrasena" placeholder="Confirme su nueva contraseña" required>
+                            <button type="button" id="toggle-password-2" class="toggle-password">
+                                <span class="eye-icon">👁️</span>
+                            </button>
+                        </div>
+                        <span class="error-message" id="confirmar-contrasena-error"></span>
+                    </div>
+                    
+                    <button type="submit" class="recovery-button">Cambiar Contraseña</button>
+                    
+                    <div class="login-link">
+                        <a href="../inicio/index.html">Volver a Iniciar Sesión</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div id="success-message" class="success-message">
+        <div class="success-content">
+            <div class="success-icon">✓</div>
+            <h2>¡Contraseña Actualizada!</h2>
+            <p>Su contraseña ha sido actualizada correctamente.</p>
+            <button id="close-success" class="success-button">Iniciar Sesión</button>
+        </div>
+    </div>
+    
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo">
+                <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-EOaIf34cLwcOlk71z2YxtJlOpQymdl.png" alt="Logo Comedor Comunitario" class="logo-small">
+                <span>Comedor Comunitario</span>
+            </div>
+            <div class="footer-info">
+                <p>Dirección: Calle Principal #123, Ciudad</p>
+                <p>Teléfono: (123) 456-7890</p>
+                <p>Horario: Lunes a Viernes 12:00 - 15:00</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 Comedor Comunitario. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+    
+    <script src="scriptRC.js?v=<?php echo time(); ?>"></script>
+</body>
+</html>
