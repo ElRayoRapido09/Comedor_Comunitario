@@ -241,3 +241,5 @@ INSERT INTO `reservacion_platillos` (`id_reservacion_platillo`, `id_reservacion`
 
 INSERT INTO `asistencias` (`id_asistencia`, `fecha_asistencia`, `confirmada_por`, `id_reservacion`) VALUES
 (1, '2025-04-24 13:05:00', 4, 3);
+
+HOLA
