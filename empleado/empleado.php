@@ -40,10 +40,10 @@ date_default_timezone_set('America/Mexico_City');
         </div>
         <div class="menu-divider"></div>
         <a href="empleado.php">Panel de Control</a>
-        <a href="../reporte/reservaciones/reservacionesEP.html">Reservaciones</a>
-        <a href="../reporte/reporte.html">Reportes</a>
+        <a href="pedidos/reservacionesEP.php">Reservaciones</a>
+        <a href="reporte/reporte.php">Reportes</a>
         <div class="menu-divider"></div>
-        <a href="../inicio/logout.php">Cerrar Sesión</a>
+        <a href="../inicio/index.html">Cerrar Sesión</a>
     </div>
 </div>
             </div>

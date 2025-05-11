@@ -140,7 +140,7 @@ document.addEventListener("DOMContentLoaded", function() {
           else if (reserva.estado === 'completada') completedCount++;
           else if (reserva.estado === 'cancelada') cancelledCount++;
 
-          if (reserva.estado !== 'cancelada') {
+          if (reserva.estado !== 'cancelada|') {
               totalPortions += parseInt(reserva.porciones);
           }
       });

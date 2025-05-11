@@ -91,6 +91,7 @@
   }
   
   .user-menu {
+    padding-bottom: 10px;
     position: relative;
   }
   
@@ -113,21 +114,29 @@
   
   .dropdown-menu {
     position: absolute;
-    top: 100%;
+    top: calc(100% - 10px);
     right: 0;
     background-color: white;
     border-radius: 5px;
     box-shadow: var(--shadow);
     width: 220px;
     padding: 10px 0;
-    margin-top: 10px;
     display: none;
     z-index: 10;
   }
   
-  .user-menu:hover .dropdown-menu {
+  .user-menu:hover .dropdown-menu,
+.dropdown-menu:hover {
     display: block;
-  }
+    opacity: 1;
+    transform: translateY(0);
+    transition: all 0.3s ease 0.1s;
+}
+.dropdown-menu {
+  transition: all 0.2s ease;
+  pointer-events: auto;
+}
+
   
   .user-info {
     padding: 10px 15px;
