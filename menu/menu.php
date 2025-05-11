@@ -1,5 +1,4 @@
 <?php
-require_once 'session_check.php';
 require_once 'database.php';
 
 // Obtener fecha actual con verificación
