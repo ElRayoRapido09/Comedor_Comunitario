@@ -91,9 +91,8 @@
   }
   
   .user-menu {
+    padding-bottom: 20px;
     position: relative;
-    display: inline-block;
-    cursor: pointer;
   }
 
   .user-icon {
@@ -115,41 +114,42 @@
   
   .dropdown-menu {
     position: absolute;
-    top: calc(100% + 5px);
+    top: calc(100% - 10px);
     right: 0;
     background-color: white;
     border-radius: 5px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: var(--shadow);
     width: 220px;
     padding: 10px 0;
-    z-index: 1001;
-    display: none;
-    opacity: 0;
-    transform: translateY(-10px);
-    transition: opacity 0.25s ease, transform 0.25s ease;
-    pointer-events: none;
+    z-index: 10;
+                                   /*solo display: none; */
+    opacity: 0;                   /* se puede borrar */ 
+    visibility: hidden;
+    transition: 
+      opacity 0.3s ease,
+      visibility 0.3s ease;
+    transition-delay: 0.1s;
   }
 
-  .dropdown-menu.active {
-    display: block;
-    opacity: 1;
-    transform: translateY(0);
-    pointer-events: auto;
-}
+  .user-menu:hover .dropdown-menu {
+    opacity: 1;                       /* solo display: block; */ 
+    visibility: visible;
+    transition-delay: 0s; 
+  }
 
-.user-menu:hover .dropdown-menu,
-.dropdown-menu:hover {
-    display: block;
-    opacity: 1;
-    transform: translateY(0);
-    pointer-events: auto;
-}
-
-  .dropdown-menu.show {
-    display: block;
-    opacity: 1;
-    transform: translateY(0);
-}
+  .user-menu::after {   /* se puede borrar */ 
+    content: '';
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: 220px;
+    height: 20px;
+    background: transparent;
+  }
+  
+  .user-menu:hover::after {
+    height: calc(100% + 10px); /* Extiende el área de hover, se puede borrar */ 
+  }
   
   .user-info {
     padding: 10px 15px;

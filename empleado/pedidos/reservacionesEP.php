@@ -38,11 +38,11 @@ require_once 'session_check.php';
                             <p class="user-role"><?php echo $_SESSION['usuario']['tipo_usuario'] === 'admin' ? 'Administrador' : 'Empleado'; ?></p>
                         </div>
                         <div class="menu-divider"></div>
-                        <a href="empleado.php">Panel de Control</a>
-                        <a href="../reporte/reservaciones/reservacionesEP.html">Reservaciones</a>
-                        <a href="../reporte/reporte.html">Reportes</a>
+                        <a href="../empleado.php">Panel de Control</a>
+                        <a href="reservacionesEP.php">Reservaciones</a>
+                        <a href="../reporte/reporte.php">Reportes</a>
                         <div class="menu-divider"></div>
-                        <a href="../inicio/logout.php">Cerrar Sesión</a>
+                        <a href="../../inicio/index.html">Cerrar Sesión</a>
                     </div>
                 </div>
             </div>
