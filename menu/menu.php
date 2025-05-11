@@ -1,4 +1,14 @@
 <?php
+// Debe ser lo PRIMERO en el archivo
+session_start();
+
+// Verificar si el usuario está logueado
+if (!isset($_SESSION['usuario'])) {
+    header("Location: ../inicio/index.php");
+    exit();
+}
+
+// [El resto de tu código PHP...]
 require_once 'database.php';
 
 // Obtener fecha actual con verificación
@@ -238,22 +248,18 @@ $usuario = $stmt_usuario->fetch(PDO::FETCH_ASSOC);
         </div>
     </footer>
     
-    <script src="scriptMN.js?v=<?php echo time(); ?>"></script>
-    <script>
-    // Objeto menuInicial MEJORADO con validaciones
-    const menuInicial = {
+    <!-- Asegúrate que esta definición esté ANTES de cargar scriptMN.js -->
+<script>
+    // Definir menuInicial ANTES de cargar el script
+    window.menuInicial = {
         id_menu: <?php echo isset($menu_dia['id_menu']) ? $menu_dia['id_menu'] : 'null'; ?>,
         fecha: '<?php echo isset($fecha_actual) ? $fecha_actual : date('Y-m-d'); ?>',
         precio: <?php echo isset($menu_dia['precio']) ? $menu_dia['precio'] : 0; ?>,
         notas: `<?php echo isset($menu_dia['notas']) ? addslashes($menu_dia['notas']) : ''; ?>`,
         secciones: <?php echo isset($secciones) ? json_encode($secciones) : '[]'; ?>
     };
-    
-    // Depuración: Verifica en consola
-    console.log('Datos del menú:', menuInicial);
-    if (!menuInicial.id_menu) {
-        console.warn('Advertencia: id_menu no está definido');
-    }
+    console.log('Datos del menú:', window.menuInicial);
 </script>
+<script src="scriptMN.js?v=<?php echo time(); ?>"></script>
 </body>
 </html>

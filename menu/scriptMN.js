@@ -1,8 +1,5 @@
 document.addEventListener("DOMContentLoaded", function() {
-    // 1. Configuración inicial y helpers
-    console.log("Script cargado correctamente"); // Para depuración
-    
-    // Función formatDate corregida
+    // 1. Función para formatear fechas
     function formatDate(date) {
         const day = String(date.getDate()).padStart(2, "0");
         const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -10,123 +7,198 @@ document.addEventListener("DOMContentLoaded", function() {
         return `${day}/${month}/${year}`;
     }
 
-    // 2. Configuración de fecha actual
-    try {
-        const currentDate = new Date();
-        document.getElementById("current-date").textContent = formatDate(currentDate);
-    } catch (e) {
-        console.error("Error al configurar fecha:", e);
+    // 2. Configuración inicial
+    console.log("Script cargado correctamente");
+    
+    // Establecer fecha actual
+    const currentDate = new Date();
+    const dateDisplay = document.getElementById("current-date");
+    if (dateDisplay) {
+        dateDisplay.textContent = formatDate(currentDate);
     }
 
-    // 3. Menú desplegable de usuario (tu código existente)
+    // 3. Menú desplegable de usuario
     const userMenu = document.getElementById('user-menu');
     const dropdownMenu = document.getElementById('dropdown-menu');
     
     if (userMenu && dropdownMenu) {
-        userMenu.addEventListener('click', (e) => {
+        userMenu.addEventListener('click', function(e) {
             e.stopPropagation();
             dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block';
         });
-        
-        document.addEventListener('click', () => {
+
+        document.addEventListener('click', function() {
             dropdownMenu.style.display = 'none';
         });
     }
 
-    // 4. Manejo del botón de reserva - Versión definitiva
+    // 4. Manejo del botón de reserva
     const reserveButton = document.getElementById('reserve-button');
     
     if (reserveButton) {
         reserveButton.addEventListener('click', function(e) {
             e.preventDefault();
-            console.log("Botón de reserva clickeado"); // Confirmación en consola
+            console.log("Botón de reserva clickeado");
+            
+            // Verificación de menuInicial
+            if (!window.menuInicial || !window.menuInicial.id_menu) {
+                console.error("No hay información de menú disponible");
+                alert("Error: No se encontró información del menú. Por favor recarga la página.");
+                return;
+            }
+            
             showReservationModal();
         });
-    } else {
-        console.error("Botón de reserva no encontrado");
     }
 
-    // 5. Funciones para el modal de reserva
+    // 5. Mostrar modal de reserva
     function showReservationModal() {
-        // Verificar si menuInicial está disponible
-        if (!window.menuInicial) {
-        console.error("Error: menuInicial no está definido");
-        alert("Error: No se encontró información del menú. Recarga la página.");
-        return;
-    }
+        console.log("Mostrando modal para menú ID:", window.menuInicial.id_menu);
 
-    if (!menuInicial.id_menu) {
-        console.error("Error: menuInicial.id_menu es null o no existe");
-        alert("Error: No hay un menú disponible para reservar hoy.");
-        return;
-    }
+        // Eliminar modal existente si hay uno
+        const existingModal = document.getElementById('reservation-modal');
+        if (existingModal) existingModal.remove();
 
-        // Crear modal
+        // Crear HTML del modal con estilos inline
         const modalHTML = `
-            <div class="modal" id="reservation-modal">
-                <div class="modal-content">
-                    <span class="close-modal">&times;</span>
-                    <h2>Reservar Comida</h2>
-                    <form id="reservation-form">
-                        <div class="form-group">
-                            <label for="hora-recogida">Hora de Recogida:</label>
-                            <select id="hora-recogida" required>
-                                <option value="12:00">12:00 PM</option>
-                                <option value="12:30">12:30 PM</option>
-                                <option value="13:00">1:00 PM</option>
-                                <option value="13:30">1:30 PM</option>
-                                <option value="14:00">2:00 PM</option>
-                                <option value="14:30">2:30 PM</option>
-                                <option value="15:00">3:00 PM</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="num-porciones">Número de Porciones (Máx. 3):</label>
-                            <input type="number" id="num-porciones" min="1" max="3" value="1" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="notas">Notas Adicionales:</label>
-                            <textarea id="notas" rows="3"></textarea>
-                        </div>
-                        <div class="button-group">
-                            <button type="button" class="cancel-button">Cancelar</button>
-                            <button type="submit" class="submit-button">Confirmar Reserva</button>
-                        </div>
-                    </form>
-                </div>
+        <div class="modal" id="reservation-modal" style="
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        ">
+            <div class="modal-content" style="
+                background: white;
+                padding: 25px;
+                border-radius: 10px;
+                width: 90%;
+                max-width: 500px;
+                box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            ">
+                <span class="close-modal" style="
+                    position: absolute;
+                    top: 15px;
+                    right: 20px;
+                    font-size: 24px;
+                    cursor: pointer;
+                    color: #666;
+                ">&times;</span>
+                
+                <h2 style="color: #9e1c3f; margin-bottom: 20px; text-align: center;">Reservar Comida</h2>
+                
+                <form id="reservation-form">
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 500;">Hora de Recogida:</label>
+                        <select id="hora-recogida" style="
+                            width: 100%;
+                            padding: 12px 15px;
+                            border: 1px solid #ddd;
+                            border-radius: 8px;
+                            font-family: inherit;
+                        " required>
+                            <option value="12:00">12:00 PM</option>
+                            <option value="12:30">12:30 PM</option>
+                            <option value="13:00">1:00 PM</option>
+                            <option value="13:30">1:30 PM</option>
+                            <option value="14:00">2:00 PM</option>
+                            <option value="14:30">2:30 PM</option>
+                            <option value="15:00">3:00 PM</option>
+                        </select>
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 500;">Número de Porciones (Máx. 3):</label>
+                        <input type="number" id="num-porciones" min="1" max="3" value="1" style="
+                            width: 100%;
+                            padding: 12px 15px;
+                            border: 1px solid #ddd;
+                            border-radius: 8px;
+                        " required>
+                    </div>
+                    
+                    <div style="margin-bottom: 25px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 500;">Notas Adicionales:</label>
+                        <textarea id="notas" rows="3" style="
+                            width: 100%;
+                            padding: 12px 15px;
+                            border: 1px solid #ddd;
+                            border-radius: 8px;
+                            resize: vertical;
+                        "></textarea>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: flex-end; gap: 15px;">
+                        <button type="button" class="cancel-button" style="
+                            padding: 10px 20px;
+                            background: #f5f5f5;
+                            border: 1px solid #ddd;
+                            border-radius: 5px;
+                            cursor: pointer;
+                            transition: all 0.3s ease;
+                        ">Cancelar</button>
+                        
+                        <button type="submit" class="submit-button" style="
+                            padding: 10px 20px;
+                            background: #9e1c3f;
+                            color: white;
+                            border: none;
+                            border-radius: 5px;
+                            cursor: pointer;
+                            transition: all 0.3s ease;
+                            font-weight: 500;
+                        ">Confirmar Reserva</button>
+                    </div>
+                </form>
             </div>
-        `;
+        </div>`;
 
+        // Insertar el modal en el DOM
         document.body.insertAdjacentHTML('beforeend', modalHTML);
-        setupModalEvents();
-    }
 
-    function setupModalEvents() {
+        // Configurar eventos del modal
         const modal = document.getElementById('reservation-modal');
-        if (!modal) return;
+        const closeBtn = modal.querySelector('.close-modal');
+        const cancelBtn = modal.querySelector('.cancel-button');
 
-        // Cerrar modal
-        modal.querySelector('.close-modal').addEventListener('click', () => modal.remove());
-        modal.querySelector('.cancel-button').addEventListener('click', () => modal.remove());
-        modal.addEventListener('click', (e) => e.target === modal && modal.remove());
+        closeBtn.onclick = function() {
+            modal.remove();
+        };
 
-        // Enviar formulario
-        const form = document.getElementById('reservation-form');
-        if (form) {
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
-                processReservation();
-            });
-        }
+        cancelBtn.onclick = function() {
+            modal.remove();
+        };
+
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                modal.remove();
+            }
+        });
+
+        // Manejar envío del formulario
+        document.getElementById('reservation-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            processReservation();
+        });
     }
 
+    // 6. Procesar la reserva
     function processReservation() {
+        console.log("Procesando reserva...");
+        
         const submitBtn = document.querySelector('#reservation-form .submit-button');
         if (!submitBtn) return;
 
+        // Deshabilitar botón durante el procesamiento
         submitBtn.disabled = true;
         submitBtn.textContent = 'Procesando...';
 
+        // Obtener datos del formulario
         const reservationData = {
             id_menu: window.menuInicial.id_menu,
             hora_recogida: document.getElementById('hora-recogida').value,
@@ -134,17 +206,29 @@ document.addEventListener("DOMContentLoaded", function() {
             notas: document.getElementById('notas').value
         };
 
-        console.log("Enviando datos:", reservationData);
+        console.log("Datos de reserva:", reservationData);
 
+        // Enviar datos al servidor
         fetch('procesar_reserva.php', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+            },
             body: JSON.stringify(reservationData)
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Error en la respuesta del servidor');
+            }
+            return response.json();
+        })
         .then(data => {
+            console.log("Respuesta del servidor:", data);
+            
             if (data.success) {
+                // Mostrar modal de confirmación
                 showConfirmationModal(data.codigo_reservacion);
+                // Cerrar modal de reserva
                 document.getElementById('reservation-modal').remove();
             } else {
                 alert(data.error || 'Error al procesar la reserva');
@@ -152,36 +236,88 @@ document.addEventListener("DOMContentLoaded", function() {
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('Error de conexión');
+            alert('Error al conectar con el servidor: ' + error.message);
         })
         .finally(() => {
+            // Restaurar botón
             submitBtn.disabled = false;
             submitBtn.textContent = 'Confirmar Reserva';
         });
     }
 
-    function showConfirmationModal(codigo) {
+    // 7. Mostrar modal de confirmación
+    function showConfirmationModal(codigoReservacion) {
         const modalHTML = `
-            <div class="modal" id="confirmation-modal">
-                <div class="modal-content confirmation">
-                    <div class="success-icon">✓</div>
-                    <h2>¡Reserva Confirmada!</h2>
-                    <div class="confirmation-code">${codigo}</div>
-                    <button class="submit-button" id="close-confirmation">Aceptar</button>
+        <div class="modal" id="confirmation-modal" style="
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        ">
+            <div class="modal-content" style="
+                background: white;
+                padding: 30px;
+                border-radius: 10px;
+                width: 90%;
+                max-width: 400px;
+                text-align: center;
+            ">
+                <div style="
+                    width: 60px;
+                    height: 60px;
+                    background-color: #4CAF50;
+                    color: white;
+                    border-radius: 50%;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    font-size: 30px;
+                    margin: 0 auto 20px;
+                ">✓</div>
+                
+                <h2 style="color: #9e1c3f; margin-bottom: 15px;">¡Reserva Confirmada!</h2>
+                <p style="margin-bottom: 20px;">Tu reserva ha sido registrada exitosamente.</p>
+                
+                <div style="
+                    background-color: #f5f5f5;
+                    padding: 15px;
+                    border-radius: 5px;
+                    margin-bottom: 25px;
+                    font-family: monospace;
+                ">
+                    <p style="margin-bottom: 5px; font-weight: 500;">Código de Reserva:</p>
+                    <div style="font-size: 18px; font-weight: bold;">${codigoReservacion}</div>
                 </div>
+                
+                <button id="close-confirmation" style="
+                    padding: 10px 20px;
+                    background: #9e1c3f;
+                    color: white;
+                    border: none;
+                    border-radius: 5px;
+                    cursor: pointer;
+                    font-weight: 500;
+                ">Aceptar</button>
             </div>
-        `;
+        </div>`;
 
         document.body.insertAdjacentHTML('beforeend', modalHTML);
-        document.getElementById('close-confirmation').addEventListener('click', () => {
+        
+        document.getElementById('close-confirmation').addEventListener('click', function() {
             document.getElementById('confirmation-modal').remove();
         });
     }
 
-    // 6. Código para el menú semanal (opcional)
+    // 8. Manejo del menú semanal (opcional)
     const daysContainer = document.querySelector(".days-container");
     if (daysContainer) {
-        daysContainer.addEventListener("click", (e) => {
+        daysContainer.addEventListener("click", function(e) {
             const dayItem = e.target.closest(".day-item");
             if (!dayItem) return;
 
@@ -202,7 +338,9 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
+    // 9. Función para actualizar la visualización del menú
     function updateMenuDisplay(menuData) {
-        // Tu implementación existente
+        // Implementación según tus necesidades
+        console.log("Actualizando menú con:", menuData);
     }
 });
