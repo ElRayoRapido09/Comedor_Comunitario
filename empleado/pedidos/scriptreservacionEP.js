@@ -437,8 +437,7 @@ document.addEventListener("DOMContentLoaded", function() {
       loadReservations(dateInput.value);
   });
 
-  // Exportar
-  document.getElementById("export-btn").addEventListener("click", exportReservations);
+
 
   function exportReservations() {
       const fecha = dateInput.value;

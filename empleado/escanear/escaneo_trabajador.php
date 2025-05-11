@@ -94,20 +94,6 @@ require_once 'session_check.php';
                     </a>
                 </nav>
             </div>
-            
-            <div class="admin-content">
-                <div class="content-header">
-                    <h2>Escaneo de Código QR</h2>
-                    <div class="header-actions">
-                        <button id="manual-entry-btn" class="secondary-btn">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                            </svg>
-                            Entrada Manual
-                        </button>
-                    </div>
-                </div>
                 
                 <div class="qr-scanner-container">
                     <div class="scanner-section">
@@ -251,68 +237,6 @@ require_once 'session_check.php';
             </div>
         </div>
     </main>
-    
-    <div id="search-user-modal" class="modal">
-        <div class="modal-content">
-            <span class="close-modal">&times;</span>
-            <h2>Buscar Usuario</h2>
-            
-            <div class="search-container modal-search">
-                <input type="text" id="modal-search-input" placeholder="Buscar por nombre, correo o ID...">
-                <button id="modal-search-btn">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="11" cy="11" r="8"></circle>
-                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                    </svg>
-                </button>
-            </div>
-            
-            <div class="search-results">
-                <table class="results-table">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Nombre</th>
-                            <th>Correo</th>
-                            <th>Acción</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>CC-001</td>
-                            <td>Juan Pérez</td>
-                            <td>juan@ejemplo.com</td>
-                            <td>
-                                <button class="select-user-btn">Seleccionar</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>CC-002</td>
-                            <td>María Rodríguez</td>
-                            <td>maria@ejemplo.com</td>
-                            <td>
-                                <button class="select-user-btn">Seleccionar</button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            
-            <div class="modal-pagination">
-                <button class="pagination-btn" disabled>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="15 18 9 12 15 6"></polyline>
-                    </svg>
-                </button>
-                <span>Página 1 de 1</span>
-                <button class="pagination-btn" disabled>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="9 18 15 12 9 6"></polyline>
-                    </svg>
-                </button>
-            </div>
-        </div>
-    </div>
     
     <div id="success-modal" class="modal">
         <div class="modal-content small-modal">

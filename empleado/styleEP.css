@@ -262,12 +262,7 @@
     align-items: center;
   }
   
-  .date-selector {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  
+
   .date-nav-btn {
     background-color: white;
     border: 1px solid #ddd;
@@ -1053,9 +1048,7 @@
       align-items: flex-start;
     }
   
-    .date-selector {
-      width: 100%;
-    }
+  
   
     input[type="date"] {
       flex: 1;
