@@ -1,5 +1,14 @@
 <?php
-require_once 'session_check.php';
+// Debe ser lo PRIMERO en el archivo
+session_start();
+
+// Verificar si el usuario está logueado
+if (!isset($_SESSION['usuario'])) {
+    header("Location: ../inicio/index.php");
+    exit();
+}
+
+// [El resto de tu código PHP...]
 require_once 'database.php';
 
 // Obtener fecha actual con verificación
@@ -179,7 +188,7 @@ $usuario = $stmt_usuario->fetch(PDO::FETCH_ASSOC);
                 
                 <div class="reservation-section">
                     <p class="reservation-info">Horario de servicio: 12:00 - 15:00</p>
-                    <button id="reserve-button" class="reserve-button">Reservar Comida</button>
+                    <button id="reserve-button" class="reserve-button" type="button">Reservar Comida</button>
                 </div>
             </div>
         </div>
@@ -239,15 +248,18 @@ $usuario = $stmt_usuario->fetch(PDO::FETCH_ASSOC);
         </div>
     </footer>
     
-    <script src="scriptMN.js?v=<?php echo time(); ?>"></script>
-    <script>
-        // Pasar datos iniciales al JavaScript
-        const menuInicial = {
-            fecha: '<?php echo $fecha_actual; ?>',
-            precio: <?php echo $menu_dia ? $menu_dia['precio'] : '0'; ?>,
-            notas: `<?php echo $menu_dia ? addslashes($menu_dia['notas']) : ''; ?>`,
-            secciones: <?php echo json_encode($secciones); ?>
-        };
-    </script>
+    <!-- Asegúrate que esta definición esté ANTES de cargar scriptMN.js -->
+<script>
+    // Definir menuInicial ANTES de cargar el script
+    window.menuInicial = {
+        id_menu: <?php echo isset($menu_dia['id_menu']) ? $menu_dia['id_menu'] : 'null'; ?>,
+        fecha: '<?php echo isset($fecha_actual) ? $fecha_actual : date('Y-m-d'); ?>',
+        precio: <?php echo isset($menu_dia['precio']) ? $menu_dia['precio'] : 0; ?>,
+        notas: `<?php echo isset($menu_dia['notas']) ? addslashes($menu_dia['notas']) : ''; ?>`,
+        secciones: <?php echo isset($secciones) ? json_encode($secciones) : '[]'; ?>
+    };
+    console.log('Datos del menú:', window.menuInicial);
+</script>
+<script src="scriptMN.js?v=<?php echo time(); ?>"></script>
 </body>
 </html>
