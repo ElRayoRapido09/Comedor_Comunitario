@@ -4,7 +4,7 @@ session_start();
 // Destruir todas las variables de sesión
 $_SESSION = array();
 
-// Si se desea destruir la sesión completamente, borra también la cookie de sesión
+// Borrar cookie de sesión
 if (ini_get("session.use_cookies")) {
     $params = session_get_cookie_params();
     setcookie(
@@ -18,10 +18,15 @@ if (ini_get("session.use_cookies")) {
     );
 }
 
-// Finalmente, destruir la sesión
+// Borrar cookie de recordar si existe
+if (isset($_COOKIE['recordar_token'])) {
+    setcookie('recordar_token', '', time() - 3600, '/');
+}
+
+// Destruir la sesión
 session_destroy();
 
-// Redirigir al usuario a la página de inicio de sesión
-header("Location: ../inicio/index.html");
+// Redirigir al login con parámetro de logout
+header("Location: ../inicio/index.html?logout=1");
 exit();
 ?>

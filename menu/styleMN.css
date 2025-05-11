@@ -769,3 +769,38 @@
 @keyframes spin {
   to { transform: translate(-50%, -50%) rotate(360deg); }
 }
+
+/* Agregar al final del archivo CSS */
+.item-name input[type="radio"] {
+  margin-right: 10px;
+  accent-color: var(--primary-color);
+  transform: scale(1.2);
+}
+
+.menu-item.unavailable input[type="radio"] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.selection-summary {
+  background-color: #f9f9f9;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  border-left: 3px solid var(--secondary-color);
+}
+
+.selection-summary h3 {
+  color: var(--primary-color);
+  margin-bottom: 10px;
+  font-size: 16px;
+}
+
+#selected-items-list li {
+  padding: 5px 0;
+  border-bottom: 1px dashed #eee;
+}
+
+#selected-items-list li:last-child {
+  border-bottom: none;
+}

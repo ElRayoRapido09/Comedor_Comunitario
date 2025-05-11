@@ -47,13 +47,47 @@ document.addEventListener("DOMContentLoaded", function() {
                 return;
             }
             
+            // Validar que se hayan seleccionado platillos en todas las secciones
+            const selectedPlatillos = getSelectedPlatillos();
+            const totalSections = document.querySelectorAll('.menu-section').length;
+            
+            if (selectedPlatillos.length < totalSections) {
+                alert('Por favor selecciona un platillo de cada sección disponible');
+                return;
+            }
+            
             showReservationModal();
         });
     }
 
-    // 5. Mostrar modal de reserva
+    // 5. Función para obtener platillos seleccionados
+    function getSelectedPlatillos() {
+        const selected = [];
+        const radioGroups = document.querySelectorAll('input[type="radio"].platillo-radio:checked');
+        
+        radioGroups.forEach(radio => {
+            const seccionId = radio.getAttribute('data-seccion');
+            const seccionElement = document.querySelector(`.section-title[data-seccion-id="${seccionId}"]`);
+            const seccionName = seccionElement ? seccionElement.textContent : 'Sección ' + seccionId;
+            const platilloName = radio.closest('.menu-item').querySelector('.item-name').textContent.replace(/^\s*[\u25CF\u25CB]\s*/, '').trim();
+            
+            selected.push({
+                id_seccion: seccionId,
+                seccion: seccionName,
+                id_platillo: radio.value,
+                platillo: platilloName
+            });
+        });
+        
+        return selected;
+    }
+
+    // 6. Mostrar modal de reserva
     function showReservationModal() {
         console.log("Mostrando modal para menú ID:", window.menuInicial.id_menu);
+
+        // Obtener platillos seleccionados
+        const selectedPlatillos = getSelectedPlatillos();
 
         // Eliminar modal existente si hay uno
         const existingModal = document.getElementById('reservation-modal');
@@ -91,6 +125,24 @@ document.addEventListener("DOMContentLoaded", function() {
                 ">&times;</span>
                 
                 <h2 style="color: #9e1c3f; margin-bottom: 20px; text-align: center;">Reservar Comida</h2>
+                
+                <div class="selection-summary" style="
+                    background-color: #f9f9f9;
+                    padding: 15px;
+                    border-radius: 8px;
+                    margin-bottom: 20px;
+                    border-left: 3px solid #c69c6d;
+                ">
+                    <h3 style="font-size: 16px; margin-bottom: 10px; color: #9e1c3f;">Tu selección:</h3>
+                    <ul id="selected-items-list" style="list-style: none; padding-left: 0;">
+                        ${selectedPlatillos.map(item => `
+                            <li style="margin-bottom: 5px; font-size: 14px;">
+                                <strong>${item.seccion}:</strong> ${item.platillo}
+                                <input type="hidden" name="platillos[${item.id_seccion}]" value="${item.id_platillo}">
+                            </li>
+                        `).join('')}
+                    </ul>
+                </div>
                 
                 <form id="reservation-form">
                     <div style="margin-bottom: 20px;">
@@ -187,27 +239,37 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    // 6. Procesar la reserva
+    // 7. Procesar la reserva
     function processReservation() {
         console.log("Procesando reserva...");
         
         const submitBtn = document.querySelector('#reservation-form .submit-button');
         if (!submitBtn) return;
-
+    
         // Deshabilitar botón durante el procesamiento
         submitBtn.disabled = true;
         submitBtn.textContent = 'Procesando...';
-
+    
+        // Obtener platillos seleccionados
+        const selectedPlatillos = getSelectedPlatillos();
+        
+        // Convertir a formato para enviar al servidor
+        const platillosData = {};
+        selectedPlatillos.forEach(item => {
+            platillosData[item.id_seccion] = item.id_platillo;
+        });
+    
         // Obtener datos del formulario
         const reservationData = {
             id_menu: window.menuInicial.id_menu,
             hora_recogida: document.getElementById('hora-recogida').value,
             num_porciones: document.getElementById('num-porciones').value,
-            notas: document.getElementById('notas').value
+            notas: document.getElementById('notas').value,
+            platillos: platillosData
         };
-
+    
         console.log("Datos de reserva:", reservationData);
-
+    
         // Enviar datos al servidor
         fetch('procesar_reserva.php', {
             method: 'POST',
@@ -217,8 +279,12 @@ document.addEventListener("DOMContentLoaded", function() {
             body: JSON.stringify(reservationData)
         })
         .then(response => {
-            if (!response.ok) {
-                throw new Error('Error en la respuesta del servidor');
+            // Primero verificar si la respuesta es JSON
+            const contentType = response.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+                return response.text().then(text => {
+                    throw new Error(`Respuesta no JSON: ${text}`);
+                });
             }
             return response.json();
         })
@@ -226,26 +292,30 @@ document.addEventListener("DOMContentLoaded", function() {
             console.log("Respuesta del servidor:", data);
             
             if (data.success) {
-                // Mostrar modal de confirmación
                 showConfirmationModal(data.codigo_reservacion);
-                // Cerrar modal de reserva
                 document.getElementById('reservation-modal').remove();
             } else {
-                alert(data.error || 'Error al procesar la reserva');
+                throw new Error(data.error || 'Error al procesar la reserva');
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('Error al conectar con el servidor: ' + error.message);
+            alert('Error: ' + error.message);
+            
+            // Mostrar más detalles en consola para depuración
+            if (error.response) {
+                error.response.text().then(text => {
+                    console.error('Respuesta del servidor:', text);
+                });
+            }
         })
         .finally(() => {
-            // Restaurar botón
             submitBtn.disabled = false;
             submitBtn.textContent = 'Confirmar Reserva';
         });
     }
 
-    // 7. Mostrar modal de confirmación
+    // 8. Mostrar modal de confirmación
     function showConfirmationModal(codigoReservacion) {
         const modalHTML = `
         <div class="modal" id="confirmation-modal" style="
@@ -314,7 +384,7 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    // 8. Manejo del menú semanal (opcional)
+    // 9. Manejo del menú semanal (opcional)
     const daysContainer = document.querySelector(".days-container");
     if (daysContainer) {
         daysContainer.addEventListener("click", function(e) {
@@ -338,9 +408,23 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    // 9. Función para actualizar la visualización del menú
+    // 10. Función para actualizar la visualización del menú
     function updateMenuDisplay(menuData) {
-        // Implementación según tus necesidades
         console.log("Actualizando menú con:", menuData);
+        // Implementación según tus necesidades
     }
+
+    // 11. Manejar cambios en la selección de platillos
+    document.addEventListener('change', function(e) {
+        if (e.target && e.target.matches('input[type="radio"].platillo-radio')) {
+            const menuItem = e.target.closest('.menu-item');
+            if (menuItem) {
+                // Resaltar el ítem seleccionado
+                document.querySelectorAll('.menu-item').forEach(item => {
+                    item.style.backgroundColor = '';
+                });
+                menuItem.style.backgroundColor = 'rgba(198, 156, 109, 0.1)';
+            }
+        }
+    });
 });
