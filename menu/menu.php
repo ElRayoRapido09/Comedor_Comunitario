@@ -178,7 +178,7 @@ $usuario = $stmt_usuario->fetch(PDO::FETCH_ASSOC);
                 
                 <div class="reservation-section">
                     <p class="reservation-info">Horario de servicio: 12:00 - 15:00</p>
-                    <button id="reserve-button" class="reserve-button">Reservar Comida</button>
+                    <button id="reserve-button" class="reserve-button" type="button">Reservar Comida</button>
                 </div>
             </div>
         </div>
@@ -240,13 +240,20 @@ $usuario = $stmt_usuario->fetch(PDO::FETCH_ASSOC);
     
     <script src="scriptMN.js?v=<?php echo time(); ?>"></script>
     <script>
-        // Pasar datos iniciales al JavaScript
-        const menuInicial = {
-            fecha: '<?php echo $fecha_actual; ?>',
-            precio: <?php echo $menu_dia ? $menu_dia['precio'] : '0'; ?>,
-            notas: `<?php echo $menu_dia ? addslashes($menu_dia['notas']) : ''; ?>`,
-            secciones: <?php echo json_encode($secciones); ?>
-        };
-    </script>
+    // Objeto menuInicial MEJORADO con validaciones
+    const menuInicial = {
+        id_menu: <?php echo isset($menu_dia['id_menu']) ? $menu_dia['id_menu'] : 'null'; ?>,
+        fecha: '<?php echo isset($fecha_actual) ? $fecha_actual : date('Y-m-d'); ?>',
+        precio: <?php echo isset($menu_dia['precio']) ? $menu_dia['precio'] : 0; ?>,
+        notas: `<?php echo isset($menu_dia['notas']) ? addslashes($menu_dia['notas']) : ''; ?>`,
+        secciones: <?php echo isset($secciones) ? json_encode($secciones) : '[]'; ?>
+    };
+    
+    // Depuración: Verifica en consola
+    console.log('Datos del menú:', menuInicial);
+    if (!menuInicial.id_menu) {
+        console.warn('Advertencia: id_menu no está definido');
+    }
+</script>
 </body>
 </html>

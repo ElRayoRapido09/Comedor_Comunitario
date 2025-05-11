@@ -1,107 +1,77 @@
 <?php
 header('Content-Type: application/json');
+session_start();
 require_once 'database.php';
 
-// Verificar que la solicitud sea POST
+// Verificar método y autenticación
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     echo json_encode(['error' => 'Método no permitido']);
     exit();
 }
 
-// Iniciar sesión para acceder al ID del usuario
-session_start();
-
-// Verificar que el usuario esté logueado
 if (!isset($_SESSION['usuario']['id_usuario'])) {
     echo json_encode(['error' => 'Usuario no autenticado']);
     exit();
 }
 
-// Obtener y validar los datos del formulario
+// Obtener datos JSON
 $data = json_decode(file_get_contents('php://input'), true);
 
-$required_fields = ['id_menu', 'hora_recogida', 'num_porciones'];
-foreach ($required_fields as $field) {
-    if (!isset($data[$field]) || empty($data[$field])) {
-        echo json_encode(['error' => "Campo requerido faltante: $field"]);
+// Validar datos
+$required = ['id_menu', 'hora_recogida', 'num_porciones'];
+foreach ($required as $field) {
+    if (empty($data[$field])) {
+        echo json_encode(['error' => "Falta el campo: $field"]);
         exit();
     }
 }
 
-$id_menu = $data['id_menu'];
-$hora_recogida = $data['hora_recogida'];
-$num_porciones = intval($data['num_porciones']);
-$notas = isset($data['notas']) ? trim($data['notas']) : null;
+// Validaciones adicionales
+if (!preg_match('/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/', $data['hora_recogida'])) {
+    echo json_encode(['error' => 'Formato de hora inválido']);
+    exit();
+}
 
-// Validar número de porciones (máximo 3)
-if ($num_porciones < 1 || $num_porciones > 3) {
+if ($data['num_porciones'] < 1 || $data['num_porciones'] > 3) {
     echo json_encode(['error' => 'Número de porciones inválido (1-3)']);
     exit();
 }
 
-// Validar formato de hora (HH:MM)
-if (!preg_match('/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/', $hora_recogida)) {
-    echo json_encode(['error' => 'Formato de hora inválido. Use HH:MM']);
-    exit();
-}
-
 try {
-    $database = new Database();
-    $db = $database->getConnection();
+    $db = (new Database())->getConnection();
 
-    // Generar código de reserva (CC-dia/mes-numero)
-    $fecha_actual = new DateTime();
-    $codigo_reservacion = 'CC-' . $fecha_actual->format('d/m') . '-' . rand(100, 999);
+    // Generar código de reserva: CC-dia-mes-numero
+    $fecha = new DateTime();
+    $codigo = 'CC-' . $fecha->format('d-m-') . rand(100, 999);
 
-    // Insertar la reserva en la base de datos
-    $query = "INSERT INTO reservaciones (
-                codigo_reservacion, 
-                id_usuario, 
-                id_menu, 
-                fecha_reservacion, 
-                hora_recogida, 
-                num_porciones, 
-                estado, 
-                notas
-              ) VALUES (
-                :codigo_reservacion, 
-                :id_usuario, 
-                :id_menu, 
-                :fecha_reservacion, 
-                :hora_recogida, 
-                :num_porciones, 
-                'pendiente', 
-                :notas
-              )";
+    // Insertar reserva
+    $stmt = $db->prepare("INSERT INTO reservaciones (
+        codigo_reservacion, id_usuario, id_menu, fecha_reservacion, 
+        hora_recogida, num_porciones, estado, notas
+    ) VALUES (?, ?, ?, ?, ?, ?, 'pendiente', ?)");
 
-    $stmt = $db->prepare($query);
-    $stmt->bindParam(':codigo_reservacion', $codigo_reservacion);
-    $stmt->bindParam(':id_usuario', $_SESSION['usuario']['id_usuario']);
-    $stmt->bindParam(':id_menu', $id_menu);
-    $stmt->bindParam(':fecha_reservacion', $fecha_actual->format('Y-m-d'));
-    $stmt->bindParam(':hora_recogida', $hora_recogida);
-    $stmt->bindParam(':num_porciones', $num_porciones, PDO::PARAM_INT);
-    $stmt->bindParam(':notas', $notas);
+    $success = $stmt->execute([
+        $codigo,
+        $_SESSION['usuario']['id_usuario'],
+        $data['id_menu'],
+        $fecha->format('Y-m-d'),
+        $data['hora_recogida'],
+        $data['num_porciones'],
+        $data['notas'] ?? null
+    ]);
 
-    if ($stmt->execute()) {
-        // Obtener el ID de la reserva recién creada
-        $id_reservacion = $db->lastInsertId();
-
-        // Aquí podrías insertar también los platillos específicos si es necesario
-        // en la tabla reservacion_platillos
-
+    if ($success) {
         echo json_encode([
             'success' => true,
-            'codigo_reservacion' => $codigo_reservacion,
-            'id_reservacion' => $id_reservacion
+            'codigo_reservacion' => $codigo,
+            'id_reservacion' => $db->lastInsertId()
         ]);
     } else {
-        echo json_encode(['error' => 'Error al crear la reserva']);
+        echo json_encode(['error' => 'Error al guardar la reserva']);
     }
-
 } catch (PDOException $e) {
-    error_log("Error de base de datos: " . $e->getMessage());
-    echo json_encode(['error' => 'Error al procesar la reserva']);
+    error_log("Error en reserva: " . $e->getMessage());
+    echo json_encode(['error' => 'Error en la base de datos']);
 } catch (Exception $e) {
     error_log("Error general: " . $e->getMessage());
     echo json_encode(['error' => 'Error inesperado']);
