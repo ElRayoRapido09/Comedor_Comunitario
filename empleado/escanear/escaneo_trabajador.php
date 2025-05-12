@@ -218,7 +218,7 @@ if (isset($_SESSION['error_message'])) {
                 </svg>
             </div>
             <h2>¡Pedido Completado!</h2>
-            <p>El pedido ha sido registrado exitosamente.</p>
+            <p>El pedido se ha completado exitosamente.</p>
             <p class="reservation-code">Código: <span id="reservation-code">CC-2504-87</span></p>
             
             <div class="modal-actions">
