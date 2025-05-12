@@ -9,7 +9,7 @@ if (!isset($_SESSION['usuario'])) {
 
 // Verificar que el usuario sea empleado o admin
 $tipoUsuario = $_SESSION['usuario']['tipo_usuario'];
-if ($tipoUsuario !== 'empleado') {
+if ($tipoUsuario !== 'empleado' && $tipoUsuario !== 'admin') {
     // Registrar el intento de acceso no autorizado
     error_log("Intento de acceso no autorizado. Tipo de usuario: $tipoUsuario");
     header('Location: ../../inicio/index.html');

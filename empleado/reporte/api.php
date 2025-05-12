@@ -4,6 +4,8 @@ header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: GET, POST");
 header("Access-Control-Allow-Headers: Content-Type");
 
+require_once 'session_check.php';
+
 $servername = "localhost";
 $username = "root";
 $password = "12345";
@@ -22,14 +24,9 @@ try {
             
             // Obtener datos del reporte
             $reportData = [
-                'summary' => [
-                    'total_beneficiarios' => getTotalBeneficiarios($conn, $startDate, $endDate),
-                    'total_reservaciones' => getTotalReservaciones($conn, $startDate, $endDate),
-                    'total_porciones' => getTotalPorciones($conn, $startDate, $endDate),
-                    'costo_promedio' => getCostoPromedio($conn, $startDate, $endDate)
-                ],
+                'summary' => getSummaryData($conn, $startDate, $endDate),
                 'reservations_by_day' => getReservationsByDay($conn, $startDate, $endDate),
-                'users_distribution' => getUsersDistribution($conn),
+                'users_distribution' => getUsersDistribution($conn, $startDate, $endDate),
                 'recent_activity' => getRecentActivity($conn, $startDate, $endDate)
             ];
             
@@ -47,55 +44,75 @@ try {
 function getSummaryData($conn, $startDate, $endDate) {
     $summary = [];
     
-    // Total Beneficiarios
-    $stmt = $conn->prepare("SELECT COUNT(DISTINCT id_usuario) as total FROM reservaciones 
-                           WHERE fecha_reservacion BETWEEN :startDate AND :endDate");
+    // Total Beneficiarios Únicos (registrados en el rango de fechas)
+    $stmt = $conn->prepare("SELECT COUNT(*) as total 
+                           FROM usuarios 
+                           WHERE tipo_usuario = 'beneficiario' 
+                           AND activo = 1
+                           AND DATE(fecha_registro) BETWEEN :startDate AND :endDate");
     $stmt->execute(['startDate' => $startDate, 'endDate' => $endDate]);
-    $summary['total_beneficiarios'] = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
+    $summary['total_beneficiarios'] = $stmt->fetchColumn() ?: 0;
     
     // Total Reservaciones
-    $stmt = $conn->prepare("SELECT COUNT(*) as total FROM reservaciones 
+    $stmt = $conn->prepare("SELECT COUNT(*) as total 
+                           FROM reservaciones
                            WHERE fecha_reservacion BETWEEN :startDate AND :endDate");
     $stmt->execute(['startDate' => $startDate, 'endDate' => $endDate]);
-    $summary['total_reservaciones'] = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
+    $summary['total_reservaciones'] = $stmt->fetchColumn() ?: 0;
     
     // Total Porciones
-    $stmt = $conn->prepare("SELECT SUM(num_porciones) as total FROM reservaciones 
+    $stmt = $conn->prepare("SELECT COALESCE(SUM(num_porciones), 0) as total 
+                           FROM reservaciones
                            WHERE fecha_reservacion BETWEEN :startDate AND :endDate");
     $stmt->execute(['startDate' => $startDate, 'endDate' => $endDate]);
-    $summary['total_porciones'] = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
+    $summary['total_porciones'] = $stmt->fetchColumn() ?: 0;
     
-    // Costo Promedio (simplificado)
-    $stmt = $conn->prepare("SELECT AVG(m.precio) as promedio FROM menus_dia m
+    // Costo Promedio
+    $stmt = $conn->prepare("SELECT COALESCE(AVG(m.precio), 0) as promedio 
+                           FROM menus_dia m
                            JOIN reservaciones r ON m.id_menu = r.id_menu
                            WHERE r.fecha_reservacion BETWEEN :startDate AND :endDate");
     $stmt->execute(['startDate' => $startDate, 'endDate' => $endDate]);
-    $summary['costo_promedio'] = number_format($stmt->fetch(PDO::FETCH_ASSOC)['promedio'], 2);
+    $summary['costo_promedio'] = number_format($stmt->fetchColumn() ?: 0, 2);
     
     return $summary;
 }
 
 function getReservationsByDay($conn, $startDate, $endDate) {
-    $stmt = $conn->prepare("SELECT DATE(fecha_reservacion) as dia, COUNT(*) as cantidad 
-                           FROM reservaciones 
-                           WHERE fecha_reservacion BETWEEN :startDate AND :endDate
-                           GROUP BY DATE(fecha_reservacion) 
-                           ORDER BY dia");
+    $stmt = $conn->prepare("SELECT 
+        DATE(fecha_reservacion) as dia, 
+        COUNT(*) as cantidad,
+        SUM(num_porciones) as porciones,
+        GROUP_CONCAT(codigo_reservacion SEPARATOR ', ') as codigos_reservacion
+        FROM reservaciones 
+        WHERE fecha_reservacion BETWEEN :startDate AND :endDate
+        GROUP BY DATE(fecha_reservacion) 
+        ORDER BY dia DESC");
     $stmt->execute(['startDate' => $startDate, 'endDate' => $endDate]);
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    // Para depuración - verificar los datos que se están obteniendo
+    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    error_log("Datos de reservaciones por día: " . print_r($results, true));
+    
+    return $results;
 }
 
-function getUsersDistribution($conn) {
+function getUsersDistribution($conn, $startDate, $endDate) {
     $distribution = [];
     
-    // Por sexo
-    $stmt = $conn->prepare("SELECT sexo, COUNT(*) as cantidad FROM usuarios 
-                           WHERE tipo_usuario = 'beneficiario' AND activo = 1
-                           GROUP BY sexo");
-    $stmt->execute();
+    // Distribución por sexo (registrados en el rango de fechas)
+    $stmt = $conn->prepare("SELECT 
+        COALESCE(sexo, 'no especificado') as sexo, 
+        COUNT(*) as cantidad 
+        FROM usuarios 
+        WHERE tipo_usuario = 'beneficiario' 
+        AND activo = 1
+        AND DATE(fecha_registro) BETWEEN :startDate AND :endDate
+        GROUP BY sexo");
+    $stmt->execute(['startDate' => $startDate, 'endDate' => $endDate]);
     $distribution['sexo'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
-    // Por edad
+    // Distribución por edad (registrados en el rango de fechas)
     $stmt = $conn->prepare("SELECT 
         CASE 
             WHEN edad < 18 THEN 'Menores de 18'
@@ -106,9 +123,11 @@ function getUsersDistribution($conn) {
         END as grupo_edad,
         COUNT(*) as cantidad
         FROM usuarios 
-        WHERE tipo_usuario = 'beneficiario' AND activo = 1
+        WHERE tipo_usuario = 'beneficiario' 
+        AND activo = 1
+        AND DATE(fecha_registro) BETWEEN :startDate AND :endDate
         GROUP BY grupo_edad");
-    $stmt->execute();
+    $stmt->execute(['startDate' => $startDate, 'endDate' => $endDate]);
     $distribution['edad'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
     return $distribution;
@@ -116,52 +135,22 @@ function getUsersDistribution($conn) {
 
 function getRecentActivity($conn, $startDate, $endDate) {
     $stmt = $conn->prepare("SELECT 
-        DATE(r.fecha_reservacion) as fecha,
+        DATE(fecha_reservacion) as fecha,
         COUNT(*) as reservaciones,
-        SUM(r.num_porciones) as porciones,
-        SUM(CASE WHEN r.estado = 'completada' THEN 1 ELSE 0 END) as completadas,
-        SUM(CASE WHEN r.estado = 'cancelada' THEN 1 ELSE 0 END) as canceladas,
-        ROUND((SUM(CASE WHEN r.estado = 'completada' THEN 1 ELSE 0 END) / COUNT(*)) * 100, 2) as tasa_asistencia
-        FROM reservaciones r
-        WHERE r.fecha_reservacion BETWEEN :startDate AND :endDate
-        GROUP BY DATE(r.fecha_reservacion)
+        SUM(num_porciones) as porciones,
+        SUM(estado = 'completada') as completadas,
+        SUM(estado = 'cancelada') as canceladas,
+        CASE 
+            WHEN COUNT(*) = 0 THEN 0
+            ELSE ROUND(SUM(estado = 'completada') * 100 / COUNT(*), 0)
+        END as tasa_asistencia
+        FROM reservaciones
+        WHERE fecha_reservacion BETWEEN :startDate AND :endDate
+        GROUP BY DATE(fecha_reservacion)
+        HAVING reservaciones > 0
         ORDER BY fecha DESC
         LIMIT 5");
     $stmt->execute(['startDate' => $startDate, 'endDate' => $endDate]);
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
-}
-function getTotalBeneficiarios($conn, $startDate, $endDate) {
-    $stmt = $conn->prepare("SELECT COUNT(DISTINCT r.id_usuario) as total 
-                           FROM reservaciones r
-                           JOIN usuarios u ON r.id_usuario = u.id_usuario
-                           WHERE r.fecha_reservacion BETWEEN :startDate AND :endDate
-                           AND u.tipo_usuario = 'beneficiario' AND u.activo = 1");
-    $stmt->execute(['startDate' => $startDate, 'endDate' => $endDate]);
-    return $stmt->fetch(PDO::FETCH_ASSOC)['total'];
-}
-
-function getTotalReservaciones($conn, $startDate, $endDate) {
-    $stmt = $conn->prepare("SELECT COUNT(*) as total 
-                           FROM reservaciones
-                           WHERE fecha_reservacion BETWEEN :startDate AND :endDate");
-    $stmt->execute(['startDate' => $startDate, 'endDate' => $endDate]);
-    return $stmt->fetch(PDO::FETCH_ASSOC)['total'];
-}
-
-function getTotalPorciones($conn, $startDate, $endDate) {
-    $stmt = $conn->prepare("SELECT SUM(num_porciones) as total 
-                           FROM reservaciones
-                           WHERE fecha_reservacion BETWEEN :startDate AND :endDate");
-    $stmt->execute(['startDate' => $startDate, 'endDate' => $endDate]);
-    return $stmt->fetch(PDO::FETCH_ASSOC)['total'];
-}
-
-function getCostoPromedio($conn, $startDate, $endDate) {
-    $stmt = $conn->prepare("SELECT AVG(m.precio) as promedio 
-                           FROM menus_dia m
-                           JOIN reservaciones r ON m.id_menu = r.id_menu
-                           WHERE r.fecha_reservacion BETWEEN :startDate AND :endDate");
-    $stmt->execute(['startDate' => $startDate, 'endDate' => $endDate]);
-    return number_format($stmt->fetch(PDO::FETCH_ASSOC)['promedio'], 2);
 }
 ?>

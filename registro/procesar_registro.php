@@ -16,7 +16,7 @@ $dbname = "comedor_comunitario";
 $response = [
     'success' => false,
     'message' => '',
-    'redirect' => '/orqui/inicio/index.html' // Ruta absoluta recomendada
+    'redirect' => '../inicio/index.html' // Ruta absoluta recomendada
 ];
 
 try {
