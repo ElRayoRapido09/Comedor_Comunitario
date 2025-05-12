@@ -1,414 +1,379 @@
-console.log("Script de escaneo de trabajador cargado.");
 document.addEventListener("DOMContentLoaded", () => {
-    // Set current date
+    // 1. Configuración inicial
+    console.log("Script de escaneo QR cargado correctamente");
     const currentDate = new Date();
-    const formattedDate = formatDate(currentDate);
-    document.getElementById("current-date").textContent = formattedDate;
-  
-    // Initialize QR Scanner
-    let html5QrCode;
-    let cameraId;
+    document.getElementById("current-date").textContent = formatDate(currentDate);
+
+    // 2. Variables de estado del escáner
+    let html5QrCode = null;
+    let cameraId = null;
     let scanning = false;
-    let devices = [];
-  
-    // Get DOM elements
-    const startScanBtn = document.getElementById("start-scan");
-    const switchCameraBtn = document.getElementById("switch-camera");
-    const scanStatus = document.getElementById("scan-status");
-    const clearFormBtn = document.getElementById("clear-form");
-    const decreaseRacionesBtn = document.getElementById("decrease-raciones");
-    const increaseRacionesBtn = document.getElementById("increase-raciones");
-    const racionesInput = document.getElementById("raciones");
-    const reservationForm = document.getElementById("reservation-form");
-    const searchUserModal = document.getElementById("search-user-modal");
-    const closeSearchModal = searchUserModal.querySelector(".close-modal");
-    const successModal = document.getElementById("success-modal");
-    const printReservationBtn = document.getElementById("print-reservation");
-    const newReservationBtn = document.getElementById("new-reservation");
-    const statusNotification = document.getElementById("status-notification");
-    const notificationMessage = document.getElementById("notification-message");
-    const manualEntryBtn = document.getElementById("manual-entry-btn");
-  
-    // Manual entry button
-    manualEntryBtn.addEventListener("click", () => {
-        searchUserModal.style.display = "flex";
-        document.body.style.overflow = "hidden";
-    });
-  
-    // Start QR Scanner - Improved version
-    startScanBtn.addEventListener("click", async () => {
+    let cameras = [];
+
+    // 3. Elementos del DOM
+    const elements = {
+        startScanBtn: document.getElementById("start-scan"),
+        switchCameraBtn: document.getElementById("switch-camera"),
+        scanStatus: document.getElementById("scan-status"),
+        reservationForm: document.getElementById("reservation-form"),
+        codigoReservacion: document.getElementById("codigo-reservacion"),
+        nombre: document.getElementById("nombre"),
+        correo: document.getElementById("correo"),
+        direccion: document.getElementById("direccion"),
+        edad: document.getElementById("edad"),
+        sexo: document.getElementById("sexo"),
+        clearFormBtn: document.getElementById("clear-form"),
+        successModal: document.getElementById("success-modal"),
+        printReservationBtn: document.getElementById("print-reservation"),
+        newReservationBtn: document.getElementById("new-reservation"),
+        statusNotification: document.getElementById("status-notification"),
+        notificationMessage: document.getElementById("notification-message"),
+        saveBtn: document.getElementById("saveBtn")
+    };
+
+    // Verificar elementos faltantes
+Object.entries(elements).forEach(([key, element]) => {
+    if (!element) {
+        console.warn(`Elemento no encontrado: ${key}`);
+    }
+});
+
+    // 4. Inicialización de eventos
+    function initEventListeners() {
+    // Verificar existencia de elementos antes de agregar listeners
+    const addListener = (element, event, handler) => {
+        if (element) {
+            element.addEventListener(event, handler);
+        } else {
+            console.warn(`Elemento no encontrado para evento ${event}`);
+        }
+    };
+
+    // Botón de escaneo
+    addListener(elements.startScanBtn, "click", toggleScanner);
+
+    // Cambiar cámara
+    addListener(elements.switchCameraBtn, "click", switchCamera);
+
+    // Limpiar formulario
+    addListener(elements.clearFormBtn, "click", clearForm);
+
+    // Envío de formulario
+    if (elements.reservationForm) {
+
+        // Envío de formulario - Validación y envío AJAX
+        if (elements.reservationForm) {
+            elements.reservationForm.addEventListener("submit", async (e) => {
+                e.preventDefault();
+                
+                const reservationCode = elements.codigoReservacion.value.trim();
+                if (!reservationCode) {
+                    showNotification("Ingrese un código de reservación válido", "error");
+                    return;
+                }
+
+                try {
+                    // Mostrar estado de carga
+                    elements.saveBtn.disabled = true;
+                    elements.saveBtn.innerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 12a9 9 0 1 1-6.219-8.56"></path>
+                        </svg>
+                        Procesando...
+                    `;
+
+                    const response = await fetch('actualizar_reservacion.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: new URLSearchParams({
+                            'codigo_reservacion': reservationCode,
+                            'id_usuario_atendio': '<?php echo $_SESSION["usuario"]["id_usuario"] ?? ""; ?>'
+                        })
+                    });
+                
+
+                    const result = await response.json();
+                        if (result.success) {
+                            // Mostrar modal de éxito
+                            document.getElementById("reservation-code").textContent = reservationCode;
+                            elements.successModal.style.display = "flex";
+                            document.body.style.overflow = "hidden";
+                        } else {
+                            showNotification(result.message || "Error al completar el pedido", "error");
+                        }
+                } catch (error) {
+                    console.error("Error:", error);
+                    showNotification("Error procesando la respuesta del servidor", "error");
+                } finally {
+                    // Restaurar estado del botón
+                    if (elements.saveBtn) {
+                        elements.saveBtn.disabled = false;
+                        elements.saveBtn.innerHTML = `
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                                <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                                <polyline points="7 3 7 8 15 8"></polyline>
+                            </svg>
+                            Completar Pedido
+                        `;
+                    }
+                }
+            });
+        }
+
+        // Modal de éxito
+        addListener(elements.printReservationBtn, "click", () => window.print());
+        addListener(elements.newReservationBtn, "click", () => {
+        elements.successModal.style.display = "none";
+        document.body.style.overflow = "auto";
+        clearForm();
+
+            });
+        }
+    }
+
+    // 5. Funciones principales del escáner
+    async function toggleScanner() {
+        if (scanning) {
+            await stopScanner();
+        } else {
+            await startScanner();
+        }
+    }
+
+    async function startScanner() {
         try {
             if (!html5QrCode) {
                 html5QrCode = new Html5Qrcode("qr-reader");
             }
-  
-            if (scanning) {
-                showNotification("La cámara ya está en uso", "error");
-                return;
-            }
-  
-            // Enhanced configuration for cross-browser compatibility
+
+            // Configuración de la cámara
             const constraints = {
                 video: {
-                    facingMode: "environment", // Prefer rear camera
+                    facingMode: "environment",
                     width: { ideal: 1280 },
                     height: { ideal: 720 }
                 }
             };
-  
-            // Check for browser support
-            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                showNotification("Tu navegador no soporta acceso a la cámara o no tiene los permisos necesarios", "error");
-                return;
-            }
-  
-            // Test camera access
-            const stream = await navigator.mediaDevices.getUserMedia(constraints);
-            stream.getTracks().forEach(track => track.stop());
-  
-            // Get available cameras with better error handling
+
+            // Obtener cámaras disponibles
             try {
-                devices = await Html5Qrcode.getCameras();
-                
-                if (devices.length === 0) {
-                    showNotification("No se encontraron cámaras disponibles", "error");
-                    return;
-                }
-  
-                // Prefer rear camera if available
-                cameraId = devices.find(device => 
-                    device.label.toLowerCase().includes('back') || 
-                    device.label.toLowerCase().includes('rear')
-                )?.id || devices[0].id;
-                
-                // Start scanner with selected camera
-                await startScanner(cameraId);
-                
-            } catch (err) {
-                console.warn("Error getting camera list, trying default configuration:", err);
-                // Fallback to basic configuration if camera enumeration fails
-                await startScanner(null, constraints);
-            }
-            
-        } catch (err) {
-            console.error("Error accessing camera:", err);
-            
-            // Enhanced error handling
-            let errorMessage = "Error al acceder a la cámara";
-            if (err.name === 'NotAllowedError') {
-                errorMessage = "Permiso de cámara denegado. Por favor habilita el acceso a la cámara en la configuración de tu navegador.";
-            } else if (err.name === 'NotFoundError') {
-                errorMessage = "No se encontró ninguna cámara en el dispositivo";
-            } else if (err.name === 'NotReadableError') {
-                errorMessage = "La cámara no puede ser accedida (¿está siendo usada por otra aplicación?)";
-            } else if (err.name === 'OverconstrainedError') {
-                errorMessage = "Configuración de cámara no compatible. Intenta con otro navegador.";
-            } else if (err.message.includes('Permission dismissed')) {
-                errorMessage = "Debes permitir el acceso a la cámara para escanear códigos QR";
-            }
-            
-            showNotification(errorMessage, "error");
-            
-            // Try basic configuration as fallback
-            if (err.name !== 'NotAllowedError' && !scanning) {
-                try {
-                    await startScanner(null, { video: true });
-                } catch (fallbackErr) {
-                    console.error("Fallback mode error:", fallbackErr);
-                }
-            }
-        }
-    });
-  
-    // Switch Camera Button
-    switchCameraBtn.addEventListener("click", async () => {
-        if (!devices || devices.length < 2) return;
-        
-        try {
-            // Get current camera index
-            const currentIndex = devices.findIndex(device => device.id === cameraId);
-            const nextIndex = (currentIndex + 1) % devices.length;
-            cameraId = devices[nextIndex].id;
-            
-            // Restart scanner with new camera
-            await stopScanner();
-            await startScanner(cameraId);
-            
-            showNotification(`Cambiado a cámara: ${devices[nextIndex].label || 'Cámara ' + (nextIndex + 1)}`);
-        } catch (err) {
-            console.error("Error switching camera:", err);
-            showNotification("Error al cambiar de cámara", "error");
-        }
-    });
-  
-    // Close Search Modal
-    closeSearchModal.addEventListener("click", () => {
-        searchUserModal.style.display = "none";
-        document.body.style.overflow = "auto";
-    });
-  
-    // Select User from Search Results
-    const selectUserBtns = document.querySelectorAll(".select-user-btn");
-    selectUserBtns.forEach((btn) => {
-        btn.addEventListener("click", function () {
-            const row = this.closest("tr");
-            const userName = row.cells[1].textContent;
-            const userEmail = row.cells[2].textContent;
-    
-            // Fill form with selected user data
-            document.getElementById("nombre").value = userName;
-            document.getElementById("correo").value = userEmail;
-    
-            // Close modal
-            searchUserModal.style.display = "none";
-            document.body.style.overflow = "auto";
-    
-            // Show success notification
-            showNotification("Usuario seleccionado correctamente");
-        });
-    });
-  
-    // Clear Form Button
-    clearFormBtn.addEventListener("click", clearForm);
-  
-    // Decrease Raciones Button
-    decreaseRacionesBtn.addEventListener("click", () => {
-        const currentValue = Number.parseInt(racionesInput.value);
-        if (currentValue > 1) {
-            racionesInput.value = currentValue - 1;
-        }
-    });
-  
-    // Increase Raciones Button
-    increaseRacionesBtn.addEventListener("click", () => {
-        const currentValue = Number.parseInt(racionesInput.value);
-        if (currentValue < 10) {
-            racionesInput.value = currentValue + 1;
-        }
-    });
-  
-    // Form Submission
-    reservationForm.addEventListener("submit", (e) => {
-        e.preventDefault();
-    
-        // Generate random reservation code
-        const randomCode = `CC-${Math.floor(Math.random() * 10000)
-            .toString()
-            .padStart(4, "0")}`;
-        document.getElementById("reservation-code").textContent = randomCode;
-    
-        // Show success modal
-        successModal.style.display = "flex";
-        document.body.style.overflow = "hidden";
-    });
-  
-    // Print Reservation Button
-    printReservationBtn.addEventListener("click", () => {
-        window.print();
-    });
-  
-    // New Reservation Button
-    newReservationBtn.addEventListener("click", () => {
-        // Close modal and clear form
-        successModal.style.display = "none";
-        document.body.style.overflow = "auto";
-        clearForm();
-    });
-  
-    // Close modals when clicking outside
-    window.addEventListener("click", (event) => {
-        if (event.target === searchUserModal) {
-            searchUserModal.style.display = "none";
-            document.body.style.overflow = "auto";
-        }
-        if (event.target === successModal) {
-            successModal.style.display = "none";
-            document.body.style.overflow = "auto";
-        }
-    });
-  
-    // Function to start QR scanner
-    async function startScanner(cameraId, constraints = null) {
-        const qrConfig = {
-            fps: 10,
-            qrbox: { width: 250, height: 250 },
-            aspectRatio: 1.0,
-            supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA],
-            rememberLastUsedCamera: true
-        };
-  
-        try {
-            if (constraints) {
-                // Compatibility mode for browsers that don't support camera enumeration well
-                await html5QrCode.start(
-                    constraints,
-                    qrConfig,
-                    onScanSuccess,
-                    onScanFailure
-                );
-            } else {
-                // Normal mode with camera ID
+                cameras = await Html5Qrcode.getCameras();
+                if (cameras.length === 0) throw new Error("No se encontraron cámaras");
+
+                cameraId = cameras.find(cam => 
+                    cam.label.toLowerCase().includes('back') || 
+                    cam.label.toLowerCase().includes('rear')
+                )?.id || cameras[0].id;
+
                 await html5QrCode.start(
                     cameraId,
-                    qrConfig,
+                    {
+                        fps: 10,
+                        qrbox: { width: 250, height: 250 }
+                    },
                     onScanSuccess,
                     onScanFailure
                 );
+
+                updateScannerUI(true);
+                showNotification("Escáner iniciado correctamente");
+
+            } catch (err) {
+                console.warn("Error al obtener cámaras, usando configuración por defecto:", err);
+                await html5QrCode.start(
+                    constraints,
+                    {
+                        fps: 10,
+                        qrbox: { width: 250, height: 250 }
+                    },
+                    onScanSuccess,
+                    onScanFailure
+                );
+                updateScannerUI(true);
             }
-  
+
             scanning = true;
-            startScanBtn.disabled = true;
-            switchCameraBtn.disabled = devices.length <= 1;
-            scanStatus.classList.add("scanning");
-            scanStatus.querySelector(".status-text").textContent = "Escaneando...";
-            
-            showNotification("Cámara iniciada correctamente");
+
         } catch (err) {
-            console.error("Error starting scanner", err);
-            
-            // Try more basic configuration as fallback
-            if (!constraints && err.message.includes('Could not start video stream')) {
-                showNotification("Intentando modo de compatibilidad...", "warning");
-                await startScanner(null, { video: true });
-                return;
-            }
-            
-            let errorMsg = "Error al iniciar el escáner";
-            if (err.message.includes('No camera found')) {
-                errorMsg = "No se encontró cámara compatible";
-            }
-            showNotification(errorMsg, "error");
+            console.error("Error al iniciar escáner:", err);
+            handleScannerError(err);
         }
     }
-  
-    // Function to stop QR scanner
+
     async function stopScanner() {
         try {
             if (html5QrCode && scanning) {
                 await html5QrCode.stop();
                 scanning = false;
-                startScanBtn.disabled = false;
-                scanStatus.classList.remove("scanning", "success", "error");
-                scanStatus.querySelector(".status-text").textContent = "Listo para escanear";
+                updateScannerUI(false);
+                showNotification("Escáner detenido");
             }
         } catch (err) {
-            console.error("Error stopping scanner:", err);
+            console.error("Error al detener escáner:", err);
+            showNotification("Error al detener el escáner", "error");
         }
     }
-  
-    // Function to handle successful QR scan
-    function onScanSuccess(decodedText, decodedResult) {
-        // Pause scanning after successful scan
-        if (html5QrCode && html5QrCode.getState() !== Html5Qrcode.SCANNING_STATE_PAUSED) {
-            html5QrCode.pause(true);
+
+    async function switchCamera() {
+        if (cameras.length < 2) return;
+
+        try {
+            await stopScanner();
+            const currentIndex = cameras.findIndex(cam => cam.id === cameraId);
+            cameraId = cameras[(currentIndex + 1) % cameras.length].id;
+            await startScanner();
+            showNotification(`Cámara cambiada a: ${cameras.find(cam => cam.id === cameraId).label || 'Cámara'}`);
+        } catch (err) {
+            console.error("Error al cambiar cámara:", err);
+            showNotification("Error al cambiar de cámara", "error");
         }
-    
-        // Update scan status UI
-        scanStatus.classList.remove("scanning", "error");
-        scanStatus.classList.add("success");
-        scanStatus.querySelector(".status-text").textContent = "¡Código QR detectado!";
-    
-        // Show success notification
+    }
+
+    // 6. Manejo de escaneos
+    function onScanSuccess(decodedText, decodedResult) {
+        html5QrCode.pause(true);
+        updateScanStatus("success", "¡Código QR detectado!");
         showNotification("Código QR escaneado correctamente");
     
         try {
-            // Parse the QR code data (assuming it's JSON)
-            const userData = JSON.parse(decodedText);
-    
-            // Fill the form with user data
-            if (userData.nombre) {
-                document.getElementById("nombre").value = userData.nombre;
+            // Verificar si el texto comienza con { y termina con } (indicador de JSON)
+            if (decodedText.trim().startsWith('{') && decodedText.trim().endsWith('}')) {
+                const userData = JSON.parse(decodedText);
+                populateForm(userData);
+            } else {
+                // Si no es JSON, asumir que es solo el código de reservación
+                elements.codigoReservacion.value = decodedText;
+                showNotification("Código de reservación escaneado");
             }
-            if (userData.correo) {
-                document.getElementById("correo").value = userData.correo;
-            }
-            if (userData.direccion) {
-                document.getElementById("direccion").value = userData.direccion;
-            }
-            if (userData.sexo) {
-                document.getElementById("sexo").value = userData.sexo.toLowerCase();
-            }
-            if (userData.edad) {
-                document.getElementById("edad").value = userData.edad;
-            }
-    
-            // Resume scanning after 3 seconds
+            
             setTimeout(() => {
-                if (html5QrCode && html5QrCode.getState() === Html5Qrcode.SCANNING_STATE_PAUSED) {
+                if (html5QrCode) {
                     html5QrCode.resume();
+                    updateScanStatus("scanning", "Escaneando...");
                 }
-                scanStatus.classList.remove("success");
-                scanStatus.classList.add("scanning");
-                scanStatus.querySelector(".status-text").textContent = "Escaneando...";
             }, 3000);
-        } catch (error) {
-            console.error("Error parsing QR code data", error);
-            showNotification("Error al procesar los datos del código QR", "error");
     
-            // Resume scanning after 2 seconds on error
+        } catch (error) {
+            console.error("Error al procesar QR:", error);
+            // Si falla el parseo, usar el texto directamente como código
+            elements.codigoReservacion.value = decodedText;
+            showNotification("Código escaneado (formato no JSON)", "warning");
+            
             setTimeout(() => {
-                if (html5QrCode && html5QrCode.getState() === Html5Qrcode.SCANNING_STATE_PAUSED) {
+                if (html5QrCode) {
                     html5QrCode.resume();
+                    updateScanStatus("scanning", "Escaneando...");
                 }
-                scanStatus.classList.remove("success");
-                scanStatus.classList.add("scanning");
-                scanStatus.querySelector(".status-text").textContent = "Escaneando...";
             }, 2000);
         }
     }
-  
-    // Function to handle scan failure
+
     function onScanFailure(error) {
-        console.log("QR code scan failed", error);
-        // Don't show notification for every failure to avoid spamming user
+        console.log("Error de escaneo:", error);
+        // No mostrar notificación para no saturar al usuario
     }
-  
-    // Function to clear form
+
+    // 7. Funciones auxiliares
+    function populateForm(data) {
+        if (data.nombre) elements.nombre.value = data.nombre;
+        if (data.correo) elements.correo.value = data.correo;
+        if (data.direccion) elements.direccion.value = data.direccion;
+        if (data.edad) elements.edad.value = data.edad;
+        if (data.sexo) elements.sexo.value = data.sexo.toLowerCase();
+        if (data.codigo_reservacion) elements.codigoReservacion.value = data.codigo_reservacion;
+    }
+
     function clearForm() {
-        document.getElementById("nombre").value = "";
-        document.getElementById("correo").value = "";
-        document.getElementById("direccion").value = "";
-        document.getElementById("edad").value = "";
-        document.getElementById("sexo").value = "";
-        document.getElementById("raciones").value = "1";
+        elements.nombre.value = "";
+        elements.correo.value = "";
+        elements.direccion.value = "";
+        elements.edad.value = "";
+        elements.sexo.value = "";
+        elements.codigoReservacion.value = "";
         
-        // Also stop scanner if active
         if (scanning) {
             stopScanner();
         }
     }
-  
-    // Function to format date as DD/MM/YYYY
+
+    function updateScannerUI(isScanning) {
+        elements.startScanBtn.disabled = isScanning;
+        elements.switchCameraBtn.disabled = !isScanning || cameras.length <= 1;
+        updateScanStatus(isScanning ? "scanning" : "ready", 
+                        isScanning ? "Escaneando..." : "Listo para escanear");
+    }
+
+    function updateScanStatus(status, text) {
+        if (!elements.scanStatus) return;
+        
+        elements.scanStatus.className = "status-indicator";
+        elements.scanStatus.classList.add(status);
+        const statusText = elements.scanStatus.querySelector(".status-text");
+        if (statusText) statusText.textContent = text;
+    }
+
+    function showNotification(message, type = "success") {
+        if (!elements.notificationMessage || !elements.statusNotification) return;
+        
+        elements.notificationMessage.textContent = message;
+        elements.statusNotification.className = "toast";
+        elements.statusNotification.style.backgroundColor = 
+            type === "error" ? "var(--error-color)" :
+            type === "warning" ? "var(--warning-color)" :
+            "var(--success-color)";
+        
+        elements.statusNotification.style.display = "block";
+        setTimeout(() => {
+            elements.statusNotification.style.display = "none";
+        }, 3000);
+    }
+
+    function handleScannerError(err) {
+        let errorMessage = "Error al acceder a la cámara";
+        
+        if (err.name === 'NotAllowedError') {
+            errorMessage = "Permiso de cámara denegado. Por favor habilite el acceso.";
+        } else if (err.name === 'NotFoundError') {
+            errorMessage = "No se encontró ninguna cámara";
+        } else if (err.name === 'NotReadableError') {
+            errorMessage = "La cámara no está disponible";
+        } else if (err.message.includes('Permission dismissed')) {
+            errorMessage = "Debe permitir el acceso a la cámara";
+        }
+        
+        showNotification(errorMessage, "error");
+    }
+
     function formatDate(date) {
         const day = String(date.getDate()).padStart(2, "0");
         const month = String(date.getMonth() + 1).padStart(2, "0");
         const year = date.getFullYear();
         return `${day}/${month}/${year}`;
     }
-  
-    // Function to show notifications
-    function showNotification(message, type = "success") {
-        notificationMessage.textContent = message;
-        statusNotification.className = "toast";
+
+    // 8. Mostrar modal de éxito si hay un código en la URL
+    function checkForSuccess() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const success = urlParams.get('success');
+        const code = urlParams.get('code');
         
-        if (type === "error") {
-            statusNotification.style.backgroundColor = "var(--error-color)";
-        } else if (type === "warning") {
-            statusNotification.style.backgroundColor = "var(--warning-color)";
-        } else {
-            statusNotification.style.backgroundColor = "var(--success-color)";
+        if (success && code) {
+            document.getElementById("reservation-code").textContent = code;
+            elements.successModal.style.display = "flex";
+            document.body.style.overflow = "hidden";
         }
-    
-        statusNotification.style.display = "block";
-        setTimeout(() => {
-            statusNotification.style.display = "none";
-        }, 3000);
     }
-  
-    // Clean up on page unload
+
+    // 9. Inicialización y limpieza
+    initEventListeners();
+    checkForSuccess();
+
     window.addEventListener("beforeunload", () => {
         if (scanning) {
             stopScanner();
         }
     });
-  });
+});

@@ -35,28 +35,26 @@ document.addEventListener("DOMContentLoaded", () => {
             const userData = {
                 nombre: document.getElementById("user-name").textContent.trim(),
                 correo: document.getElementById("user-email").textContent.trim(),
-                edad: parseInt(document.getElementById("user-age").textContent) || 0,
-                direccion: document.getElementById("user-address").textContent.trim(),
-                sexo: document.getElementById("user-gender").textContent.toLowerCase().trim()
+                codigo_reservacion: extractReservationCode()
             };
-
+    
             console.log("Datos para QR:", userData); // Para depuración
-
+    
             const qrContainer = document.getElementById("profile-qr");
             
             // Limpiar contenedor
             qrContainer.innerHTML = "";
-
+    
             // Validación básica
             if (!userData.nombre) {
                 throw new Error("Se requiere nombre completo");
             }
-
+    
             // Crear instancia QR
             const qr = qrcode(0, 'H'); // Tipo automático, corrección alta
             qr.addData(JSON.stringify(userData));
             qr.make();
-
+    
             // Generar imagen QR
             const qrImg = document.createElement('img');
             qrImg.src = qr.createDataURL(4, 0); // Tamaño 4px, sin margen
@@ -66,7 +64,7 @@ document.addEventListener("DOMContentLoaded", () => {
             
             // Agregar al DOM
             qrContainer.appendChild(qrImg);
-
+    
         } catch (error) {
             console.error("Error al generar QR:", error);
             
@@ -83,7 +81,16 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // 5. Inicialización de la aplicación
+    // 5. Función para extraer el código de reservación del texto
+    function extractReservationCode() {
+        const reservationText = document.getElementById("user-reservation").textContent.trim();
+        if (reservationText.includes("Código:")) {
+            return reservationText.split("Código: ")[1].split(" - ")[0];
+        }
+        return "Sin reservación";
+    }
+
+    // 6. Inicialización de la aplicación
     function initApp() {
         try {
             // Generar QR al cargar
@@ -93,6 +100,12 @@ document.addEventListener("DOMContentLoaded", () => {
             const nombre = document.getElementById("user-name").textContent.trim();
             if (nombre && nombre !== "Usuario Ejemplo") {
                 showToast(`Bienvenido ${nombre.split(' ')[0]}`, false);
+            }
+            
+            // Verificar si hay reservación pendiente y mostrar notificación
+            const reservationCode = extractReservationCode();
+            if (reservationCode !== "Sin reservación") {
+                showToast(`Tiene una reservación pendiente (${reservationCode})`, false);
             }
             
         } catch (error) {
