@@ -1,5 +1,14 @@
 <?php
 require_once 'session_check.php';
+if (isset($_SESSION['success_message'])) {
+    echo '<div class="success-message">'.$_SESSION['success_message'].'</div>';
+    unset($_SESSION['success_message']);
+}
+
+if (isset($_SESSION['error_message'])) {
+    echo '<div class="error-message">'.$_SESSION['error_message'].'</div>';
+    unset($_SESSION['error_message']);
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -143,7 +152,7 @@ require_once 'session_check.php';
                     
                     <div class="form-section">
                         <div class="form-header">
-                            <h3>Información del Usuario</h3>
+                            <h3>Detalles del Pedido</h3>
                             <div class="form-actions">
                                 <button id="clear-form" class="text-btn">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -159,6 +168,12 @@ require_once 'session_check.php';
                         </div>
                         
                         <form id="reservation-form">
+                            <div class="form-group">
+                                <label for="codigo-reservacion">Código de Reservación</label>
+                                <input type="text" id="codigo-reservacion" name="codigo-reservacion" required>
+                                <input type="hidden" name="id_usuario_atendio" value="<?php echo $_SESSION['usuario']['id_usuario'] ?? ''; ?>">
+                            </div>
+                            
                             <div class="form-row">
                                 <div class="form-group">
                                     <label for="nombre">Nombre Completo</label>
@@ -172,63 +187,19 @@ require_once 'session_check.php';
                                     <input type="email" id="correo" name="correo">
                                 </div>
                                 
-                                <div class="form-group">
-                                    <label for="edad">Edad</label>
-                                    <input type="number" id="edad" name="edad" min="0" max="120">
-                                </div>
                             </div>
                             
-                            <div class="form-group">
-                                <label for="direccion">Dirección</label>
-                                <input type="text" id="direccion" name="direccion">
-                            </div>
                             
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="sexo">Sexo</label>
-                                    <select id="sexo" name="sexo">
-                                        <option value="">Seleccionar</option>
-                                        <option value="masculino">Masculino</option>
-                                        <option value="femenino">Femenino</option>
-                                        <option value="otro">Otro</option>
-                                    </select>
-                                </div>
-                            </div>
                             
-                            <div class="form-divider"></div>
-                            
-                            <div class="form-header">
-                                <h3>Raciones</h3>
-                            </div>
-                            
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="raciones">Número de Raciones</label>
-                                    <div class="quantity-input">
-                                        <button type="button" id="decrease-raciones" class="quantity-btn">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                <line x1="5" y1="12" x2="19" y2="12"></line>
-                                            </svg>
-                                        </button>
-                                        <input type="number" id="raciones" name="raciones" min="1" max="10" value="1" required>
-                                        <button type="button" id="increase-raciones" class="quantity-btn">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                <line x1="12" y1="5" x2="12" y2="19"></line>
-                                                <line x1="5" y1="12" x2="19" y2="12"></line>
-                                            </svg>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
                             <div class="form-actions-bottom">
                                 <button type="button" id="cancel-btn" class="secondary-btn">Cancelar</button>
-                                <button type="submit" id="save-btn" class="primary-btn">
+                                <button type="submit" id="saveBtn" class="primary-btn">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                         <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
                                         <polyline points="17 21 17 13 7 13 7 21"></polyline>
                                         <polyline points="7 3 7 8 15 8"></polyline>
                                     </svg>
-                                    Guardar Reservación
+                                                    Completar Pedido
                                 </button>
                             </div>
                         </form>
@@ -246,8 +217,8 @@ require_once 'session_check.php';
                     <polyline points="22 4 12 14.01 9 11.01"></polyline>
                 </svg>
             </div>
-            <h2>¡Reservación Guardada!</h2>
-            <p>La reservación ha sido registrada exitosamente.</p>
+            <h2>¡Pedido Completado!</h2>
+            <p>El pedido ha sido registrado exitosamente.</p>
             <p class="reservation-code">Código: <span id="reservation-code">CC-2504-87</span></p>
             
             <div class="modal-actions">
@@ -265,7 +236,7 @@ require_once 'session_check.php';
                         <path d="M12 8v8"></path>
                         <path d="M8 12h8"></path>
                     </svg>
-                    Nueva Reservación
+                    Nuevo Pedido
                 </button>
             </div>
         </div>
@@ -299,6 +270,6 @@ require_once 'session_check.php';
     </footer>
     
     <script src="https://unpkg.com/html5-qrcode"></script>
-    <script src="escaneo_trabajador_script.js?v=<?php echo time(); ?>"></script>
+    <script src="escaneo_trabajador_script.js?v=<?php echo time(); ?>" defer></script>
 </body>
 </html>

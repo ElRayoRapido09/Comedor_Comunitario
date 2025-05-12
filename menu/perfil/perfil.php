@@ -3,11 +3,11 @@
 require_once 'session_check.php';
 require_once 'conexion.php';
 
-// Obtener ID del usuario de la sesión (usando 'id' en lugar de 'id_usuario')
+// Obtener ID del usuario de la sesión
 $id_usuario = $_SESSION['usuario']['id'];
 
 // Consulta para obtener datos del usuario
-$sql = "SELECT * FROM usuarios WHERE id_usuario = ?"; // Asumiendo que la columna en BD se llama id_usuario
+$sql = "SELECT * FROM usuarios WHERE id_usuario = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $id_usuario);
 $stmt->execute();
@@ -18,6 +18,18 @@ if ($result && $result->num_rows > 0) {
 } else {
     die("Usuario no encontrado");
 }
+
+// Consulta para obtener la última reservación pendiente
+$sqlReservacion = "SELECT codigo_reservacion, fecha_reservacion 
+                   FROM reservaciones 
+                   WHERE id_usuario = ? AND estado = 'pendiente'
+                   ORDER BY fecha_reservacion DESC 
+                   LIMIT 1";
+$stmtReservacion = $conn->prepare($sqlReservacion);
+$stmtReservacion->bind_param("i", $id_usuario);
+$stmtReservacion->execute();
+$resultReservacion = $stmtReservacion->get_result();
+$reservacionPendiente = $resultReservacion->fetch_assoc();
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -96,6 +108,19 @@ if ($result && $result->num_rows > 0) {
                                     <div class="info-item">
                                         <span class="info-label">Edad</span>
                                         <span class="info-value" id="user-age"><?php echo htmlspecialchars($datosUsuario['edad']); ?> años</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <span class="info-label">Reservación Pendiente</span>
+                                        <span class="info-value" id="user-reservation">
+                                            <?php 
+                                            if ($reservacionPendiente) {
+                                                echo "Código: " . htmlspecialchars($reservacionPendiente['codigo_reservacion']) . 
+                                                     " - Fecha: " . htmlspecialchars($reservacionPendiente['fecha_reservacion']);
+                                            } else {
+                                                echo "No tiene reservaciones pendientes";
+                                            }
+                                            ?>
+                                        </span>
                                     </div>
                                 </div>
                                 
