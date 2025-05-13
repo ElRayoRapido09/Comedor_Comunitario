@@ -255,28 +255,7 @@ require_once 'session_check.php';
                             </div>
                         </div>
                         
-                        <div class="chart-container full-width">
-                            <div class="chart-header">
-                                <h3>Ventas por Período</h3>
-                                <div class="chart-actions">
-                                    <div class="period-selector">
-                                        <button class="period-btn active" data-period="day">Día</button>
-                                        <button class="period-btn" data-period="week">Semana</button>
-                                        <button class="period-btn" data-period="month">Mes</button>
-                                    </div>
-                                    <button class="chart-action-btn">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                            <circle cx="12" cy="12" r="1"></circle>
-                                            <circle cx="19" cy="12" r="1"></circle>
-                                            <circle cx="5" cy="12" r="1"></circle>
-                                        </svg>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="chart">
-                                <canvas id="sales-period-chart"></canvas>
-                            </div>
-                        </div>
+                       
 
                         <div class="report-table-container">
                             <div class="table-header">
@@ -1214,5 +1193,7 @@ function showToast(message) {
     }, 3000);
 }
 </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/locale/es.min.js"></script>
 </body>
 </html>
