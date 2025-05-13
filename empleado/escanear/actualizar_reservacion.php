@@ -1,75 +1,61 @@
 <?php
-session_start();
 require_once 'session_check.php';
-require_once 'conexion.php';
 
-// Configurar el tipo de contenido primero
+// Configuración de respuesta
 header('Content-Type: application/json');
 
-// Verificar método POST
+// Limpiar buffer de salida
+while (ob_get_level()) ob_end_clean();
+
+// Solo método POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
-    die(json_encode([
-        'success' => false,
-        'message' => 'Método no permitido'
-    ]));
+    die(json_encode(['success' => false, 'message' => 'Método no permitido']));
 }
 
-// Verificar datos requeridos
-if (empty($_POST['codigo_reservacion'])) {
+// Validar entrada
+$codigo_reservacion = filter_input(INPUT_POST, 'codigo_reservacion', FILTER_SANITIZE_STRING);
+if (empty($codigo_reservacion)) {
     http_response_code(400);
-    die(json_encode([
-        'success' => false,
-        'message' => 'Código de reservación requerido'
-    ]));
-}
-
-// Asegurar que el ID de usuario existe en sesión
-if (!isset($_SESSION['usuario']['id_usuario'])) {
-    http_response_code(401);
-    die(json_encode([
-        'success' => false,
-        'message' => 'ID de usuario no encontrado en sesión'
-    ]));
+    die(json_encode(['success' => false, 'message' => 'Código requerido']));
 }
 
 try {
-    // Actualizar reservación
+    require_once 'conexion.php';
+    
     $stmt = $conn->prepare("
         UPDATE reservaciones 
         SET estado = 'completada', 
-            id_usuario_atendio = :id_usuario_atendio, 
+            id_usuario_atendio = :id_usuario, 
             fecha_atencion = NOW() 
-        WHERE codigo_reservacion = :codigo_reservacion
+        WHERE codigo_reservacion = :codigo
         AND estado = 'pendiente'
     ");
     
     $stmt->execute([
-        ':codigo_reservacion' => $_POST['codigo_reservacion'],
-        ':id_usuario_atendio' => $_SESSION['usuario']['id_usuario']
+        ':id_usuario' => $_SESSION['usuario']['id_usuario'],
+        ':codigo' => $codigo_reservacion
     ]);
     
-    // Verificar si se actualizó alguna fila
     if ($stmt->rowCount() > 0) {
-        echo json_encode([
+        die(json_encode([
             'success' => true,
-            'message' => 'Pedido completado con éxito'
-        ]);
-    } else {
-        http_response_code(404);
-        echo json_encode([
-            'success' => false,
-            'message' => 'No se encontró la reservación o ya fue completada'
-        ]);
+            'message' => 'Reservación completada'
+        ]));
     }
-    exit();
-
+    
+    http_response_code(404);
+    die(json_encode([
+        'success' => false,
+        'message' => 'Reservación no encontrada'
+    ]));
+    
 } catch (PDOException $e) {
     http_response_code(500);
-    echo json_encode([
+    die(json_encode([
         'success' => false,
-        'message' => 'Error de base de datos: ' . $e->getMessage()
-    ]);
-    exit();
+        'message' => 'Error en base de datos',
+        'error' => $e->getMessage()
+    ]));
 }
 ?>
