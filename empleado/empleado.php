@@ -39,7 +39,7 @@ date_default_timezone_set('America/Mexico_City');
             <p class="user-role"><?php echo $_SESSION['usuario']['tipo_usuario'] === 'admin' ? 'Administrador' : 'Empleado'; ?></p>
         </div>
         <div class="menu-divider"></div>
-        <a href="empleado.php">Panel de Control</a>
+        <a href="registro_empleado/registro_empleados.html">Registrar Empleado</a>
         <a href="pedidos/reservacionesEP.php">Reservaciones</a>
         <a href="reporte/reporte.php">Reportes</a>
         <div class="menu-divider"></div>

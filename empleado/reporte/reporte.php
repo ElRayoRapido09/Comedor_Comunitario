@@ -38,7 +38,7 @@ require_once 'session_check.php';
                             <p class="user-role"><?php echo $_SESSION['usuario']['tipo_usuario'] === 'admin' ? 'Administrador' : 'Empleado'; ?></p>
                         </div>
                         <div class="menu-divider"></div>
-                        <a href="../empleado.php">Panel de Control</a>
+                        <a href="../registro_empleado/registro_empleados.html">Registrar Empleado</a>
                         <a href="../pedidos/reservacionesEP.php">Reservaciones</a>
                         <a href="../reporte/reporte.php">Reportes</a>
                         <div class="menu-divider"></div>
@@ -255,42 +255,12 @@ require_once 'session_check.php';
                             </div>
                         </div>
                         
-                        <div class="chart-container full-width">
-                            <div class="chart-header">
-                                <h3>Ventas por Período</h3>
-                                <div class="chart-actions">
-                                    <div class="period-selector">
-                                        <button class="period-btn active" data-period="day">Día</button>
-                                        <button class="period-btn" data-period="week">Semana</button>
-                                        <button class="period-btn" data-period="month">Mes</button>
-                                    </div>
-                                    <button class="chart-action-btn">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                            <circle cx="12" cy="12" r="1"></circle>
-                                            <circle cx="19" cy="12" r="1"></circle>
-                                            <circle cx="5" cy="12" r="1"></circle>
-                                        </svg>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="chart">
-                                <canvas id="sales-period-chart"></canvas>
-                            </div>
-                        </div>
+
 
                         <div class="report-table-container">
                             <div class="table-header">
                                 <h3>Resumen de Actividad Reciente</h3>
-                                <div class="table-actions">
-                                    <button class="secondary-btn">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                                            <polyline points="7 10 12 15 17 10"></polyline>
-                                            <line x1="12" y1="15" x2="12" y2="3"></line>
-                                        </svg>
-                                        Exportar
-                                    </button>
-                                </div>
+                               
                             </div>
                             <div class="table-container">
                                 <table class="report-table">
@@ -1084,23 +1054,7 @@ require_once 'session_check.php';
                     </div>
                 </div>
                 
-                <div class="report-actions">
-                    <button id="print-report-btn" class="secondary-btn">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <polyline points="6 9 6 2 18 2 18 9"></polyline>
-                            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
-                            <rect x="6" y="14" width="12" height="8"></rect>
-                        </svg>
-                        Imprimir Reporte
-                    </button>
-                    <button id="export-report-btn" class="secondary-btn">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                            <polyline points="7 10 12 15 17 10"></polyline>
-                            <line x1="12" y1="15" x2="12" y2="3"></line>
-                        </svg>
-                        Exportar a Excel
-                    </button>
+                
                     <button id="save-report-btn" class="primary-btn">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>

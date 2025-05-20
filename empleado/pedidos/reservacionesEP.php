@@ -38,7 +38,7 @@ require_once 'session_check.php';
                             <p class="user-role"><?php echo $_SESSION['usuario']['tipo_usuario'] === 'admin' ? 'Administrador' : 'Empleado'; ?></p>
                         </div>
                         <div class="menu-divider"></div>
-                        <a href="../empleado.php">Panel de Control</a>
+                        <a href="../registro_empleado/registro_empleados.html">Registrar Empleado</a>
                         <a href="reservacionesEP.php">Reservaciones</a>
                         <a href="../reporte/reporte.php">Reportes</a>
                         <div class="menu-divider"></div>
@@ -111,14 +111,7 @@ require_once 'session_check.php';
                             </button>
                         </div>
                         
-                        <button id="print-btn" class="secondary-btn">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <polyline points="6 9 6 2 18 2 18 9"></polyline>
-                                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
-                                <rect x="6" y="14" width="12" height="8"></rect>
-                            </svg>
-                            Imprimir
-                        </button>
+                        
                     </div>
                 </div>
                 
@@ -175,7 +168,7 @@ require_once 'session_check.php';
                         </div>
                         <div class="summary-info">
                             <h3>Pendientes</h3>
-                            <p class="summary-count">12</p>
+                            <p class="summary-count"></p>
                         </div>
                     </div>
                     
@@ -188,7 +181,7 @@ require_once 'session_check.php';
                         </div>
                         <div class="summary-info">
                             <h3>Completadas</h3>
-                            <p class="summary-count">8</p>
+                            <p class="summary-count"></p>
                         </div>
                     </div>
                     
@@ -202,7 +195,7 @@ require_once 'session_check.php';
                         </div>
                         <div class="summary-info">
                             <h3>Canceladas</h3>
-                            <p class="summary-count">2</p>
+                            <p class="summary-count"></p>
                         </div>
                     </div>
                     
@@ -217,7 +210,7 @@ require_once 'session_check.php';
                         </div>
                         <div class="summary-info">
                             <h3>Total Porciones</h3>
-                            <p class="summary-count">35</p>
+                            <p class="summary-count"></p>
                         </div>
                     </div>
                 </div>
@@ -290,198 +283,8 @@ require_once 'session_check.php';
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>CC-2504-87</td>
-                                <td>Juan Pérez</td>
-                                <td>12:00</td>
-                                <td>2</td>
-                                <td>
-                                    <button class="view-menu-btn">Ver Menú</button>
-                                </td>
-                                <td>
-                                    <span class="status-badge pending">Pendiente</span>
-                                </td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <button class="action-btn view-btn" title="Ver detalles">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                                <circle cx="12" cy="12" r="3"></circle>
-                                            </svg>
-                                        </button>
-                                        <button class="action-btn complete-btn" title="Marcar como completada">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                                            </svg>
-                                        </button>
-                                        <button class="action-btn cancel-btn" title="Cancelar reservación">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                <circle cx="12" cy="12" r="10"></circle>
-                                                <line x1="15" y1="9" x2="9" y2="15"></line>
-                                                <line x1="9" y1="9" x2="15" y2="15"></line>
-                                            </svg>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>CC-2504-92</td>
-                                <td>María Rodríguez</td>
-                                <td>12:30</td>
-                                <td>3</td>
-                                <td>
-                                    <button class="view-menu-btn">Ver Menú</button>
-                                </td>
-                                <td>
-                                    <span class="status-badge pending">Pendiente</span>
-                                </td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <button class="action-btn view-btn" title="Ver detalles">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                                <circle cx="12" cy="12" r="3"></circle>
-                                            </svg>
-                                        </button>
-                                        <button class="action-btn complete-btn" title="Marcar como completada">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                                            </svg>
-                                        </button>
-                                        <button class="action-btn cancel-btn" title="Cancelar reservación">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                <circle cx="12" cy="12" r="10"></circle>
-                                                <line x1="15" y1="9" x2="9" y2="15"></line>
-                                                <line x1="9" y1="9" x2="15" y2="15"></line>
-                                            </svg>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>CC-2504-65</td>
-                                <td>Carlos Gómez</td>
-                                <td>13:00</td>
-                                <td>1</td>
-                                <td>
-                                    <button class="view-menu-btn">Ver Menú</button>
-                                </td>
-                                <td>
-                                    <span class="status-badge completed">Completada</span>
-                                </td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <button class="action-btn view-btn" title="Ver detalles">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                                <circle cx="12" cy="12" r="3"></circle>
-                                            </svg>
-                                        </button>
-                                        <button class="action-btn print-btn" title="Imprimir comprobante">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                <polyline points="6 9 6 2 18 2 18 9"></polyline>
-                                                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
-                                                <rect x="6" y="14" width="12" height="8"></rect>
-                                            </svg>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>CC-2504-78</td>
-                                <td>Ana Martínez</td>
-                                <td>13:30</td>
-                                <td>4</td>
-                                <td>
-                                    <button class="view-menu-btn">Ver Menú</button>
-                                </td>
-                                <td>
-                                    <span class="status-badge pending">Pendiente</span>
-                                </td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <button class="action-btn view-btn" title="Ver detalles">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                  stroke-linecap="round" stroke-linejoin="round">
-                                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                                <circle cx="12" cy="12" r="3"></circle>
-                                            </svg>
-                                        </button>
-                                        <button class="action-btn complete-btn" title="Marcar como completada">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                                            </svg>
-                                        </button>
-                                        <button class="action-btn cancel-btn" title="Cancelar reservación">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                <circle cx="12" cy="12" r="10"></circle>
-                                                <line x1="15" y1="9" x2="9" y2="15"></line>
-                                                <line x1="9" y1="9" x2="15" y2="15"></line>
-                                            </svg>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>CC-2504-43</td>
-                                <td>Roberto Sánchez</td>
-                                <td>14:00</td>
-                                <td>2</td>
-                                <td>
-                                    <button class="view-menu-btn">Ver Menú</button>
-                                </td>
-                                <td>
-                                    <span class="status-badge completed">Completada</span>
-                                </td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <button class="action-btn view-btn" title="Ver detalles">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                                <circle cx="12" cy="12" r="3"></circle>
-                                            </svg>
-                                        </button>
-                                        <button class="action-btn print-btn" title="Imprimir comprobante">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                <polyline points="6 9 6 2 18 2 18 9"></polyline>
-                                                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
-                                                <rect x="6" y="14" width="12" height="8"></rect>
-                                            </svg>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>CC-2504-56</td>
-                                <td>Laura Torres</td>
-                                <td>14:30</td>
-                                <td>2</td>
-                                <td>
-                                    <button class="view-menu-btn">Ver Menú</button>
-                                </td>
-                                <td>
-                                    <span class="status-badge cancelled">Cancelada</span>
-                                </td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <button class="action-btn view-btn" title="Ver detalles">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                                <circle cx="12" cy="12" r="3"></circle>
-                                            </svg>
-                                        </button>
-                                        <button class="action-btn restore-btn" title="Restaurar reservación">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
-                                                <path d="M3 3v5h5"></path>
-                                            </svg>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
+                            
+                            
                         </tbody>
                     </table>
                 </div>
