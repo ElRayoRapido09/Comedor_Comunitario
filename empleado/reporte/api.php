@@ -33,6 +33,15 @@ try {
             echo json_encode(['success' => true, 'data' => $reportData]);
             break;
             
+        case 'get_sales_data':
+            $period = $_GET['period'] ?? 'day';
+            $startDate = $_GET['startDate'] ?? date('Y-m-d', strtotime('-1 month'));
+            $endDate = $_GET['endDate'] ?? date('Y-m-d');
+            
+            $salesData = getSalesData($conn, $period, $startDate, $endDate);
+            echo json_encode(['success' => true, 'data' => $salesData]);
+            break;
+            
         default:
             echo json_encode(['success' => false, 'message' => 'Acción no válida']);
     }
@@ -152,5 +161,103 @@ function getRecentActivity($conn, $startDate, $endDate) {
         LIMIT 5");
     $stmt->execute(['startDate' => $startDate, 'endDate' => $endDate]);
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+function getSalesData($conn, $period, $startDate, $endDate) {
+    // Convertir fechas a objetos DateTime
+    $start = new DateTime($startDate);
+    $end = new DateTime($endDate);
+    
+    // Crear array con todos los períodos
+    $periods = [];
+    $interval = null;
+    $format = '';
+    
+    switch($period) {
+        case 'day':
+            $interval = new DateInterval('P1D');
+            $format = 'd/m/Y';
+            break;
+        case 'week':
+            $interval = new DateInterval('P1W');
+            $format = 'o-\WW';
+            break;
+        case 'month':
+            $interval = new DateInterval('P1M');
+            $format = 'm/Y';
+            break;
+    }
+    
+    // Generar todos los períodos en el rango
+    $periodo = clone $start;
+    while ($periodo <= $end) {
+        $periods[$periodo->format($format)] = [
+            'total_ventas' => 0,
+            'num_reservaciones' => 0,
+            'total_porciones' => 0
+        ];
+        $periodo->add($interval);
+    }
+    
+    // Obtener datos reales de la base de datos
+    $query = "SELECT ";
+    
+    switch($period) {
+        case 'day':
+            $query .= "DATE_FORMAT(r.fecha_reservacion, '%d/%m/%Y') as periodo_formateado, ";
+            $groupBy = "DATE(r.fecha_reservacion)";
+            break;
+        case 'week':
+            $query .= "DATE_FORMAT(r.fecha_reservacion, '%Y-%u') as periodo_formateado, ";
+            $groupBy = "YEARWEEK(r.fecha_reservacion, 1)";
+            break;
+        case 'month':
+            $query .= "DATE_FORMAT(r.fecha_reservacion, '%m/%Y') as periodo_formateado, ";
+            $groupBy = "DATE_FORMAT(r.fecha_reservacion, '%Y-%m')";
+            break;
+    }
+    
+    $query .= "SUM(m.precio * r.num_porciones) as total_ventas,
+              COUNT(r.id_reservacion) as num_reservaciones,
+              SUM(r.num_porciones) as total_porciones
+              FROM reservaciones r
+              JOIN menus_dia m ON r.id_menu = m.id_menu
+              WHERE r.fecha_reservacion BETWEEN :startDate AND :endDate
+              AND r.estado = 'completada'
+              GROUP BY {$groupBy}";
+    
+    $stmt = $conn->prepare($query);
+    $stmt->execute(['startDate' => $startDate, 'endDate' => $endDate]);
+    $resultados = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    // Combinar con los períodos generados
+    foreach ($resultados as $row) {
+        $periodoKey = $row['periodo_formateado'];
+        if (isset($periods[$periodoKey])) {
+            $periods[$periodoKey] = [
+                'total_ventas' => (float)$row['total_ventas'],
+                'num_reservaciones' => (int)$row['num_reservaciones'],
+                'total_porciones' => (int)$row['total_porciones']
+            ];
+        }
+    }
+    
+    // Preparar respuesta final
+    $data = [];
+    foreach ($periods as $periodo => $valores) {
+        $data[] = [
+            'periodo_formateado' => $periodo,
+            'total_ventas' => $valores['total_ventas'],
+            'num_reservaciones' => $valores['num_reservaciones'],
+            'total_porciones' => $valores['total_porciones']
+        ];
+    }
+    
+    // Ordenar por fecha
+    usort($data, function($a, $b) use ($period) {
+        return strtotime($a['periodo_formateado']) - strtotime($b['periodo_formateado']);
+    });
+    
+    return $data;
 }
 ?>

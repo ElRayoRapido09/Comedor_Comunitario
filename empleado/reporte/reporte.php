@@ -254,8 +254,7 @@ require_once 'session_check.php';
                                 </div>
                             </div>
                         </div>
-                        
-
+                      
 
                         <div class="report-table-container">
                             <div class="table-header">
@@ -1168,5 +1167,7 @@ function showToast(message) {
     }, 3000);
 }
 </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/locale/es.min.js"></script>
 </body>
 </html>
