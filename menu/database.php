@@ -1,9 +1,9 @@
 <?php
 class Database {
-    private $host = 'localhost';
-    private $db_name = 'comedor_comunitario';
-    private $username = 'root';
-    private $password = '12345';
+    private $host = 'ep-dry-bonus-aaew9wqb-pooler.westus3.azure.neon.tech';
+    private $db_name = 'neondb';
+    private $username = 'neondb_owner';
+    private $password = 'npg_XimlV9vFBoN6';
     private $conn;
 
     public function getConnection() {
