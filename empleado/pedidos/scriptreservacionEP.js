@@ -5,6 +5,163 @@ document.addEventListener("DOMContentLoaded", function() {
   let dateInput = document.getElementById("reservations-date");
   
   // ----------------------------
+  // INICIALIZACIÓN Y CONFIGURACIÓN DE FECHAS
+  // ----------------------------
+    // Establecer fecha actual por defecto si no está configurada
+  function initializeDateInput() {
+    if (!dateInput.value) {
+      const today = new Date();
+      // Usar fecha local para evitar problemas de zona horaria
+      const todayStr = today.getFullYear() + '-' + 
+                      String(today.getMonth() + 1).padStart(2, '0') + '-' + 
+                      String(today.getDate()).padStart(2, '0');
+      dateInput.value = todayStr;
+      console.log('Fecha inicializada:', todayStr);
+    } else {
+      console.log('Fecha ya configurada:', dateInput.value);
+    }
+  }
+  // Navegación de fechas
+  function navigateDate(direction) {
+    console.log('Navegando fecha:', direction, 'desde:', dateInput.value);
+    
+    // Crear fecha usando el constructor de Date con componentes separados para evitar problemas de zona horaria
+    const dateStr = dateInput.value;
+    const [year, month, day] = dateStr.split('-').map(num => parseInt(num, 10));
+    const currentDate = new Date(year, month - 1, day); // month - 1 porque Date usa meses base 0
+    
+    console.log('Fecha actual creada:', currentDate);
+    
+    // Verificar que la fecha sea válida
+    if (isNaN(currentDate.getTime())) {
+      console.error('Fecha inválida:', dateInput.value);
+      initializeDateInput();
+      return;
+    }
+    
+    // Navegar la fecha
+    if (direction === 'prev') {
+      currentDate.setDate(currentDate.getDate() - 1);
+      console.log('Retrocediendo un día a:', currentDate);
+    } else if (direction === 'next') {
+      currentDate.setDate(currentDate.getDate() + 1);
+      console.log('Avanzando un día a:', currentDate);
+    }
+    
+    // Formatear la nueva fecha
+    const newDateStr = currentDate.getFullYear() + '-' + 
+                      String(currentDate.getMonth() + 1).padStart(2, '0') + '-' + 
+                      String(currentDate.getDate()).padStart(2, '0');
+    
+    console.log('Nueva fecha formateada:', newDateStr);
+    
+    // Actualizar el input
+    dateInput.value = newDateStr;
+    
+    // Mostrar mensaje de carga
+    const loadingMessage = `Cargando reservaciones para ${formatDate(currentDate)}...`;
+    showToast(loadingMessage, 'info');
+      // Cargar las reservaciones
+    loadReservations(newDateStr);
+  }
+  
+  // Event listeners para navegación de fechas con manejo de errores
+  const prevDateBtn = document.getElementById("prev-date");
+  const nextDateBtn = document.getElementById("next-date");
+  
+  console.log('Elementos encontrados:', {
+    prevDateBtn: !!prevDateBtn,
+    nextDateBtn: !!nextDateBtn,
+    dateInput: !!dateInput
+  });
+  
+  // Variable para prevenir múltiples clics rápidos
+  let isNavigating = false;
+  
+  if (prevDateBtn) {
+    prevDateBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      if (isNavigating) {
+        console.log('Navegación en proceso, ignorando clic');
+        return;
+      }
+      isNavigating = true;
+      
+      // Deshabilitar botón temporalmente
+      prevDateBtn.disabled = true;
+      
+      navigateDate('prev');
+      
+      // Rehabilitar después de un breve delay
+      setTimeout(() => {
+        isNavigating = false;
+        prevDateBtn.disabled = false;
+      }, 500);
+    });
+  } else {
+    console.warn('Botón prev-date no encontrado');
+  }
+
+  if (nextDateBtn) {
+    nextDateBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      if (isNavigating) {
+        console.log('Navegación en proceso, ignorando clic');
+        return;
+      }
+      isNavigating = true;
+      
+      // Deshabilitar botón temporalmente
+      nextDateBtn.disabled = true;
+      
+      navigateDate('next');
+      
+      // Rehabilitar después de un breve delay
+      setTimeout(() => {
+        isNavigating = false;
+        nextDateBtn.disabled = false;
+      }, 500);
+    });
+  } else {
+    console.warn('Botón next-date no encontrado');
+  }
+
+  // Event listener para cambio directo de fecha
+  dateInput.addEventListener("change", function() {
+    console.log('Fecha cambiada a:', this.value);
+    loadReservations(this.value);
+  });
+  // Agregar teclas de navegación con teclado
+  document.addEventListener("keydown", function(event) {
+    // Solo si no hay un modal abierto o input enfocado
+    if (document.querySelector('.modal[style*="display: block"]') || 
+        document.activeElement.tagName === 'INPUT' || 
+        document.activeElement.tagName === 'TEXTAREA' ||
+        isNavigating) {
+      return;
+    }
+    
+    if (event.key === 'ArrowLeft') {
+      event.preventDefault();
+      if (!isNavigating) {
+        isNavigating = true;
+        navigateDate('prev');
+        setTimeout(() => { isNavigating = false; }, 500);
+      }
+    } else if (event.key === 'ArrowRight') {
+      event.preventDefault();
+      if (!isNavigating) {
+        isNavigating = true;
+        navigateDate('next');
+        setTimeout(() => { isNavigating = false; }, 500);
+      }
+    }
+  });
+
+  // Inicializar fecha
+  initializeDateInput();
+
+  // ----------------------------
   // FUNCIONES DE UTILIDAD
   // ----------------------------
 
@@ -23,10 +180,23 @@ document.addEventListener("DOMContentLoaded", function() {
       const minutes = String(date.getMinutes()).padStart(2, "0");
       return `${day}/${month}/${year} ${hours}:${minutes}`;
   }
-
   function showToast(message, type = 'success') {
       const toast = document.getElementById('status-confirmation');
-      toast.textContent = message;
+      if (!toast) {
+          console.warn('Toast element not found');
+          return;
+      }
+      
+      // Limpiar clases anteriores
+      toast.className = 'toast';
+      
+      const toastContent = toast.querySelector('.toast-content span');
+      if (toastContent) {
+          toastContent.textContent = message;
+      } else {
+          toast.textContent = message;
+      }
+      
       toast.className = 'toast ' + type;
       toast.style.display = 'block';
       
@@ -363,37 +533,8 @@ document.addEventListener("DOMContentLoaded", function() {
   // ----------------------------
   // INICIALIZACIÓN
   // ----------------------------
-
-  // Configurar fecha inicial
-  const currentDate = new Date();
-  document.getElementById("current-date").textContent = formatDate(currentDate);
-  
-  // Formatear input de fecha
-  const year = currentDate.getFullYear();
-  const month = String(currentDate.getMonth() + 1).padStart(2, "0");
-  const day = String(currentDate.getDate()).padStart(2, "0");
-  dateInput.value = `${year}-${month}-${day}`;
-
-  // Navegación de fechas
-  document.getElementById("prev-date").addEventListener("click", () => {
-      const date = new Date(dateInput.value);
-      date.setDate(date.getDate() - 1);
-      updateDateInput(date);
-  });
-
-  document.getElementById("next-date").addEventListener("click", () => {
-      const date = new Date(dateInput.value);
-      date.setDate(date.getDate() + 1);
-      updateDateInput(date);
-  });
-
-  function updateDateInput(date) {
-      const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, "0");
-      const day = String(date.getDate()).padStart(2, "0");
-      dateInput.value = `${year}-${month}-${day}`;
-      loadReservations(dateInput.value);
-  }
+  // Inicialización ya se hace en initializeDateInput() arriba
+  // Los event listeners de navegación ya están configurados arriba con debouncing
 
   // Cambio de fecha
   dateInput.addEventListener("change", () => {
@@ -407,26 +548,66 @@ document.addEventListener("DOMContentLoaded", function() {
   document.getElementById("search-input").addEventListener("keypress", (e) => {
       if (e.key === "Enter") applyFilters();
   });
-
   function applyFilters() {
       const status = document.getElementById("status-filter").value;
       const time = document.getElementById("time-filter").value;
       const search = document.getElementById("search-input").value.toLowerCase();
       
+      console.log('Aplicando filtros:', { status, time, search });
+      
       const rows = document.querySelectorAll(".reservations-table tbody tr");
+      let visibleCount = 0;
       
       rows.forEach(row => {
+          // Skip the "no data" row
+          if (row.querySelector('td[colspan]')) {
+              return;
+          }
+          
           const statusCell = row.querySelector(".status-badge").textContent.toLowerCase();
           const timeCell = row.querySelector("td:nth-child(3)").textContent;
           const nameCell = row.querySelector("td:nth-child(2)").textContent.toLowerCase();
           const codeCell = row.querySelector("td:nth-child(1)").textContent.toLowerCase();
           
-          const statusMatch = status === "all" || statusCell === status;
+          // Map English filter values to Spanish status text
+          let statusMatch = false;
+          if (status === "all") {
+              statusMatch = true;
+          } else if (status === "pending" && statusCell === "pendiente") {
+              statusMatch = true;
+          } else if (status === "completed" && statusCell === "completada") {
+              statusMatch = true;
+          } else if (status === "cancelled" && statusCell === "cancelada") {
+              statusMatch = true;
+          }
+          
           const timeMatch = time === "all" || timeCell === time;
           const searchMatch = search === "" || nameCell.includes(search) || codeCell.includes(search);
           
-          row.style.display = (statusMatch && timeMatch && searchMatch) ? "" : "none";
+          const shouldShow = statusMatch && timeMatch && searchMatch;
+          row.style.display = shouldShow ? "" : "none";
+          
+          if (shouldShow) {
+              visibleCount++;
+          }
+          
+          console.log('Fila procesada:', {
+              codigo: codeCell,
+              nombre: nameCell,
+              estado: statusCell,
+              statusMatch,
+              timeMatch,
+              searchMatch,
+              shouldShow
+          });
       });
+      
+      console.log(`Filtros aplicados: ${visibleCount} reservaciones visibles`);
+      
+      // Show message if no results
+      if (visibleCount === 0 && rows.length > 0) {
+          showToast('No se encontraron reservaciones con los filtros aplicados', 'info');
+      }
   }
 
   // Limpiar filtros
@@ -446,12 +627,11 @@ document.addEventListener("DOMContentLoaded", function() {
       
       window.open(`exportar_reservaciones.php?fecha=${fecha}&estado=${estado}&hora=${hora}`, '_blank');
   }
-
   // Imprimir
-  document.getElementById("print-btn").addEventListener("click", () => {
+  document.getElementById("print-btn")?.addEventListener("click", () => {
       window.print();
   });
-
   // Cargar reservaciones iniciales
+  console.log('Iniciando carga de reservaciones iniciales con fecha:', dateInput.value);
   loadReservations(dateInput.value);
 });

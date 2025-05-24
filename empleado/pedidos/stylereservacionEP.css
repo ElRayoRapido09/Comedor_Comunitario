@@ -245,30 +245,75 @@
     align-items: center;
     gap: 10px;
   }
-  
-  .date-nav-btn {
+    .date-nav-btn {
     background-color: white;
     border: 1px solid #ddd;
-    border-radius: 5px;
-    width: 30px;
-    height: 30px;
+    border-radius: 8px;
+    width: 35px;
+    height: 35px;
     display: flex;
     justify-content: center;
     align-items: center;
     cursor: pointer;
     transition: var(--transition);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   }
   
   .date-nav-btn:hover {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(158, 28, 63, 0.3);
+  }
+  
+  .date-nav-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Mejorar accesibilidad de botones de navegación */
+  .date-nav-btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(158, 28, 63, 0.3);
+  }
+  
+  .date-nav-btn:disabled {
     background-color: #f5f5f5;
-    border-color: var(--secondary-color);
+    border-color: #e0e0e0;
+    color: #ccc;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+  
+  .date-nav-btn:disabled:hover {
+    background-color: #f5f5f5;
+    border-color: #e0e0e0;
+    color: #ccc;
+    transform: none;
+    box-shadow: none;
   }
   
   input[type="date"] {
-    padding: 6px 10px;
+    padding: 8px 12px;
     border: 1px solid #ddd;
-    border-radius: 5px;
+    border-radius: 8px;
     font-family: "Montserrat", sans-serif;
+    font-size: 14px;
+    background-color: white;
+    transition: var(--transition);
+    min-width: 150px;
+  }
+  
+  input[type="date"]:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(158, 28, 63, 0.2);
+  }
+  
+  input[type="date"]:hover {
+    border-color: var(--secondary-color);
   }
   
   .secondary-btn {
@@ -857,17 +902,32 @@
     background-color: var(--success-color);
     color: white;
     padding: 15px 20px;
-    border-radius: 5px;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
     display: none;
     z-index: 1100;
     animation: slideIn 0.3s ease, fadeOut 0.5s ease 2.5s forwards;
+    max-width: 350px;
+    word-wrap: break-word;
+  }
+  
+  .toast.error {
+    background-color: var(--error-color);
+  }
+  
+  .toast.warning {
+    background-color: var(--warning-color);
+  }
+  
+  .toast.info {
+    background-color: #2196F3;
   }
   
   .toast-content {
     display: flex;
     align-items: center;
     gap: 10px;
+    font-weight: 500;
   }
   
   @keyframes slideIn {
@@ -1034,4 +1094,3 @@
       width: 100%;
     }
   }
-  

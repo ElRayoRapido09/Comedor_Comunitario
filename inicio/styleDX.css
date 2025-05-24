@@ -136,21 +136,93 @@
     font-size: 12px;
     margin-top: 5px;
   }
-  
-  .password-container {
+    .password-container {
     position: relative;
+  }
+  
+  .password-container input[type="password"],
+  .password-container input[type="text"] {
+    width: 100%;
+    padding: 12px 45px 12px 15px; /* Más espacio para el botón mejorado */
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: var(--input-bg);
+    font-size: 14px;
+    transition: var(--transition);
+    font-family: "Montserrat", sans-serif;
   }
   
   .toggle-password {
     position: absolute;
-    right: 10px;
+    right: 8px;
     top: 50%;
     transform: translateY(-50%);
-    background: none;
+    background: transparent;
     border: none;
     cursor: pointer;
-    font-size: 16px;
-    color: #777;
+    padding: 6px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    outline: none;
+    color: var(--text-light);
+  }
+  
+  .toggle-password:hover {
+    background-color: rgba(158, 28, 63, 0.08);
+    color: var(--primary-color);
+    transform: translateY(-50%) scale(1.05);
+  }
+  
+  .toggle-password:active {
+    transform: translateY(-50%) scale(0.95);
+    background-color: rgba(158, 28, 63, 0.15);
+  }
+  
+  .toggle-password:focus {
+    box-shadow: 0 0 0 2px rgba(158, 28, 63, 0.2);
+  }
+  
+  .eye-icon {
+    width: 18px;
+    height: 18px;
+    transition: all 0.3s ease;
+    pointer-events: none;
+  }
+  
+  .eye-icon .eye-open {
+    transition: all 0.3s ease;
+  }
+  
+  .eye-icon .eye-closed {
+    transition: all 0.3s ease;
+  }
+  
+  /* Estado cuando la contraseña está oculta */
+  .toggle-password[data-state="hidden"] .eye-closed {
+    display: none;
+  }
+  
+  .toggle-password[data-state="hidden"] .eye-open {
+    display: block;
+  }
+  
+  /* Estado cuando la contraseña está visible */
+  .toggle-password[data-state="visible"] .eye-open {
+    display: none;
+  }
+  
+  .toggle-password[data-state="visible"] .eye-closed {
+    display: block;
+  }
+  
+  /* Animación de rotación suave */
+  .toggle-password.changing .eye-icon {
+    transform: rotateY(180deg);
   }
   
   .options-row {
@@ -427,76 +499,12 @@
       flex-direction: column;
       align-items: center;
       text-align: center;
-    }
-  }
+    }  }
 
 
 
 
 
-
-/* Estilos para el contenedor de contraseña */
-.password-container {
-  position: relative;
-}
-
-.password-container input[type="password"],
-.password-container input[type="text"] {
-  width: 100%;
-  padding: 12px 15px; /* Mantener el mismo padding que otros inputs */
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  background-color: var(--input-bg);
-  font-size: 14px;
-  transition: var(--transition);
-  font-family: "Montserrat", sans-serif;
-  padding-right: 40px; /* Espacio para el botón */
-}
-
-/* Estilos para el botón de toggle */
-.toggle-password {
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  width: 24px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-light);
-  transition: var(--transition);
-  outline: none;
-}
-
-.toggle-password:hover {
-  color: var(--primary-color);
-}
-
-/* Animación del icono del ojo */
-.eye-icon {
-  display: inline-block;
-  font-size: 16px;
-  transition: all 0.3s ease;
-  transform-origin: center center;
-  line-height: 1;
-}
-
-.eye-icon.closed {
-  transform: scaleY(0.5) translateY(1px);
-  opacity: 0.8;
-}
-
-/* Mantener el focus style consistente */
-.password-container input:focus {
-  outline: none;
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 2px rgba(158, 28, 63, 0.2);
-}
 
 /* Mejorar los mensajes de error */
 .error-message {

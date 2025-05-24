@@ -96,15 +96,14 @@ require_once 'session_check.php';
             <div class="admin-content">
                 <div class="content-header">
                     <h2>Administrar Reservaciones</h2>
-                    <div class="header-actions">
-                        <div class="date-selector">
-                            <button id="prev-date" class="date-nav-btn">
+                    <div class="header-actions">                        <div class="date-selector">
+                            <button id="prev-date" class="date-nav-btn" title="Día anterior (←)">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <polyline points="15 18 9 12 15 6"></polyline>
                                 </svg>
                             </button>
-                            <input type="date" id="reservations-date" value="2025-04-16">
-                            <button id="next-date" class="date-nav-btn">
+                            <input type="date" id="reservations-date" value="2025-04-16" title="Seleccionar fecha">
+                            <button id="next-date" class="date-nav-btn" title="Día siguiente (→)">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <polyline points="9 18 15 12 9 6"></polyline>
                                 </svg>

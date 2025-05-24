@@ -99,32 +99,57 @@ document.getElementById('login-form').addEventListener('submit', async function(
     if (debug) console.debug('Error debug:', debug);
   }
   
-  // Toggle password visibility
-  // Reemplaza la función existente del toggle-password
-// Función para mostrar/ocultar contraseña (mejorada)
+  // Función para mostrar/ocultar contraseña (mejorada con iconos SVG)
 document.getElementById('toggle-password').addEventListener('click', function() {
     const passwordInput = document.getElementById('contrasena');
-    const eyeIcon = this.querySelector('.eye-icon');
+    const button = this;
+    const eyeOpen = button.querySelector('.eye-open');
+    const eyeClosed = button.querySelector('.eye-closed');
     
+    // Agregar clase de animación
+    button.classList.add('changing');
+    
+    // Cambiar el tipo de input y mostrar/ocultar iconos
     if (passwordInput.type === 'password') {
         passwordInput.type = 'text';
-        eyeIcon.classList.remove('closed');
-        // Animación de apertura
-        eyeIcon.style.transform = 'scaleY(1)';
-        eyeIcon.style.opacity = '1';
+        button.setAttribute('data-state', 'visible');
+        button.setAttribute('aria-label', 'Ocultar contraseña');
+        
+        // Mostrar ojo cerrado (contraseña visible)
+        eyeOpen.style.display = 'none';
+        eyeClosed.style.display = 'block';
     } else {
         passwordInput.type = 'password';
-        eyeIcon.classList.add('closed');
-        // Animación de cierre
-        eyeIcon.style.transform = 'scaleY(0.5) translateY(1px)';
-        eyeIcon.style.opacity = '0.8';
+        button.setAttribute('data-state', 'hidden');
+        button.setAttribute('aria-label', 'Mostrar contraseña');
+        
+        // Mostrar ojo abierto (contraseña oculta)
+        eyeClosed.style.display = 'none';
+        eyeOpen.style.display = 'block';
     }
-  });
-  
-  // Asegurar que el ojo empiece cerrado al cargar la página
-  document.addEventListener('DOMContentLoaded', function() {
-    const eyeIcon = document.querySelector('.eye-icon');
-    if (eyeIcon && document.getElementById('contrasena').type === 'password') {
-        eyeIcon.classList.add('closed');
+    
+    // Remover clase de animación después de la transición
+    setTimeout(() => {
+        button.classList.remove('changing');
+    }, 300);
+});
+
+// Asegurar que el botón tenga el estado inicial correcto
+document.addEventListener('DOMContentLoaded', function() {
+    const toggleButton = document.getElementById('toggle-password');
+    const passwordInput = document.getElementById('contrasena');
+    
+    if (toggleButton && passwordInput) {
+        // Estado inicial: contraseña oculta, mostrar ojo abierto
+        toggleButton.setAttribute('data-state', 'hidden');
+        toggleButton.setAttribute('aria-label', 'Mostrar contraseña');
+        
+        const eyeOpen = toggleButton.querySelector('.eye-open');
+        const eyeClosed = toggleButton.querySelector('.eye-closed');
+        
+        if (eyeOpen && eyeClosed) {
+            eyeOpen.style.display = 'block';
+            eyeClosed.style.display = 'none';
+        }
     }
-  });
+});
