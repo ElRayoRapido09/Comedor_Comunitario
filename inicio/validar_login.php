@@ -2,13 +2,13 @@
 header('Content-Type: application/json');
 
 // Configuración de la base de datos
-$host = 'ep-dry-bonus-aaew9wqb-pooler.westus3.azure.neon.tech';
-$dbname = 'neondb';
-$username = 'neondb_owner';
-$password = 'npg_XimlV9vFBoN6';
+$host = 'localhost';
+$dbname = 'comedor_comunitario';
+$username = 'root';
+$password = '12345';
 
 try {
-    $conn = new PDO("pgsql:host=$host;dbname=$dbname", $username, $password);
+    $conn = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $username, $password);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     
     $data = json_decode(file_get_contents('php://input'), true);
