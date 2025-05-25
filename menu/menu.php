@@ -193,32 +193,6 @@ $usuario = $_SESSION['usuario'];
                 </div>
             </div>
         <?php endif; ?>
-        
-        <div class="weekly-menu-preview">
-            <h3>Menú de la Semana</h3>
-            <div class="days-container">
-                <?php 
-                $dias_semana = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
-                $hoy = date('Y-m-d');
-                $fecha_mostrada = $menu_dia ? $menu_dia['fecha'] : $hoy;
-                
-                foreach ($menus_semana as $menu): 
-                    $fecha = new DateTime($menu['fecha']);
-                    $dia_semana = $fecha->format('w');
-                    $es_hoy = ($menu['fecha'] == $hoy);
-                    $es_mostrado = ($menu['fecha'] == $fecha_mostrada);
-                    
-                    $nombre_dia = $dias_semana[$dia_semana];
-                ?>
-                <div class="day-item <?= ($es_hoy || $es_mostrado) ? 'active' : '' ?>" 
-                     data-fecha="<?= $menu['fecha'] ?>"
-                     data-dia-semana="<?= $dia_semana ?>">
-                    <div class="day-name"><?= $es_hoy ? 'Hoy' : $nombre_dia ?></div>
-                    <div class="day-date"><?= $fecha->format('d/m') ?></div>
-                </div>
-                <?php endforeach; ?>
-            </div>
-        </div>
     </main>
     
     <footer>

@@ -107,7 +107,7 @@ date_default_timezone_set('America/Mexico_City');
                 <div class="menu-editor">
                     <div class="menu-header">
                         <h2 class="menu-title">Menú del Día</h2>
-                        <div class="menu-price-editor">
+                        <div class="menu-date-editor">
                             <label for="menu-price">Precio:</label>
                             <div class="price-input">
                                 <span class="currency">$</span>
