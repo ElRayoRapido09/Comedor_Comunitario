@@ -1,9 +1,9 @@
 <?php
 // config.php
-define('DB_HOST', 'bdhfuadlo1hz1ht8dfxp-mysql.services.clever-cloud.com');
-define('DB_USER', 'uzcgof6xqfxne5xg');
-define('DB_PASS', 'NcvzgSUbiBtmGEYnheBv');
-define('DB_NAME', 'bdhfuadlo1hz1ht8dfxp');
+define('DB_HOST', 'localhost');
+define('DB_USER', 'root');
+define('DB_PASS', '12345');
+define('DB_NAME', 'comedor_comunitario');
 
 // Configuración para el correo electrónico
 define('MAIL_HOST', 'smtp.gmail.com'); // Cambia según tu proveedor

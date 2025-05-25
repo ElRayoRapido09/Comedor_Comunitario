@@ -2,10 +2,10 @@
 header('Content-Type: application/json');
 
 // Configuración de la base de datos
-$host = 'bdhfuadlo1hz1ht8dfxp-mysql.services.clever-cloud.com';
-$dbname = 'bdhfuadlo1hz1ht8dfxp';
-$username = 'uzcgof6xqfxne5xg';
-$password = 'NcvzgSUbiBtmGEYnheBv';
+$host = 'localhost';
+$dbname = 'comedor_comunitario';
+$username = 'root';
+$password = '12345';
 
 try {
     $conn = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $username, $password);

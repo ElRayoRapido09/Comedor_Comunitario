@@ -6,10 +6,10 @@ header("Access-Control-Allow-Headers: Content-Type");
 
 require_once 'session_check.php';
 
-$servername = 'bdhfuadlo1hz1ht8dfxp-mysql.services.clever-cloud.com';
-$username = 'bdhfuadlo1hz1ht8dfxp';
-$password = 'uzcgof6xqfxne5xg';
-$dbname = 'NcvzgSUbiBtmGEYnheBv';
+$servername = "localhost";
+$username = "root";
+$password = "12345";
+$dbname = "comedor_comunitario";
 
 try {
     $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
