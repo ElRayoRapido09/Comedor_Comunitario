@@ -7,10 +7,10 @@ header('Content-Type: application/json');
 header("Access-Control-Allow-Origin: *"); // Opcional para desarrollo
 
 // Configuración de la base de datos
-$servername = "localhost";
-$username = "root";
-$password = "12345";
-$dbname = "comedor_comunitario";
+$servername = 'bdhfuadlo1hz1ht8dfxp-mysql.services.clever-cloud.com';
+$username = 'bdhfuadlo1hz1ht8dfxp';
+$password = 'uzcgof6xqfxne5xg';
+$dbname = 'NcvzgSUbiBtmGEYnheBv';
 
 // Respuesta JSON
 $response = [

@@ -1,9 +1,9 @@
 <?php
 class Database {
-    private $host = 'localhost';
-    private $db_name = 'comedor_comunitario';
-    private $username = 'root';
-    private $password = '12345';
+    private $host = 'bdhfuadlo1hz1ht8dfxp-mysql.services.clever-cloud.com';
+    private $db_name = 'bdhfuadlo1hz1ht8dfxp';
+    private $username = 'uzcgof6xqfxne5xg';
+    private $password = 'NcvzgSUbiBtmGEYnheBv';
     private $conn;
 
     public function getConnection() {

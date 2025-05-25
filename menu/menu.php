@@ -119,7 +119,6 @@ $usuario = $_SESSION['usuario'];
                     <div class="dropdown-menu" id="dropdown-menu">
                         <a href="perfil/perfil.php">Mi Perfil</a>
                         <a href="logout.php">Cerrar Sesión</a>
-                        <a href="registrar_empleado.php">registrar empleado</a>
                     </div>
                 </div>
             </div>

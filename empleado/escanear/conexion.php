@@ -1,8 +1,8 @@
 <?php
-$host = 'localhost'; // o tu servidor de base de datos
-$dbname = 'comedor_comunitario';
-$username = 'root';
-$password = '12345';
+$host = 'bdhfuadlo1hz1ht8dfxp-mysql.services.clever-cloud.com';
+$dbname = 'bdhfuadlo1hz1ht8dfxp';
+$username = 'uzcgof6xqfxne5xg';
+$password = 'NcvzgSUbiBtmGEYnheBv';
 
 try {
     $conn = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, $password);
