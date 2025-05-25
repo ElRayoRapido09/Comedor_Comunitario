@@ -1,5 +1,5 @@
 <?php
-require_once 'session_check.php';
+require_once '../session_check.php';
 if (isset($_SESSION['success_message'])) {
     echo '<div class="success-message">'.$_SESSION['success_message'].'</div>';
     unset($_SESSION['success_message']);

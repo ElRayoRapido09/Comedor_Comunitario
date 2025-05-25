@@ -1,5 +1,5 @@
 <?php
-require_once 'session_check.php';
+require_once '../session_check.php';
 date_default_timezone_set('America/Mexico_City');
 ?>
 <!DOCTYPE html>
